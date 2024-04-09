@@ -4,6 +4,8 @@ import dotenv from 'dotenv'
 dotenv.config()
 
 import { connectDB } from './db/postgresConnection.mjs';
+import usersRouter from './routes/users.mjs'
+
 const app = express();
 
 const startServer = async () => {
@@ -11,10 +13,17 @@ const startServer = async () => {
         const message = await connectDB()
         console.log(message);
 
-        const PORT = process.env.PORT;
+        app.use(
+            '/api/v1/planpro',
+            usersRouter
+        );
+
         app.use(express.json());
+
+        const PORT = process.env.PORT;
+
         app.listen(PORT, () => {
-            console.log('Server is listening on port 3000')
+            console.log('Server is listening on port 1000')
         });
 
     } catch (error) {
