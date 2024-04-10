@@ -1,44 +1,60 @@
-import { styled } from 'styled-components';
+import { Link } from 'react-router-dom';
+import styled from 'styled-components';
 import logo from '../assets/logo.svg';
-
+import projects_icon from '../assets/projects_icon.svg';
+import tasks_icon from '../assets/tasks_icon.svg';
+import account_icon from '../assets/account_icon.svg';
 
 const NavbarContainer = styled.nav`
   background-color: black;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 20px;
+  padding: 13px 20px;
 `;
 
-const LogoContainer = styled.div``; // Tuščias div logotipui
+const LogoContainer = styled.div``;
 const Logo = styled.img`
-  height: 30px;
+  height: 24px;
 `;
 
-// const IconsContainer = styled.div`
-//   display: flex;
-//   align-items: center;
-// `;
-// const Icon = styled.div`
-//   color: white;
-//   font-size: 24px;
-//   margin: 0 10px;
-// `;
+const IconsContainer = styled.div`
+  display: flex;
+  align-items: center;
+`;
 
+const Icon = styled(Link)`
+  color: white;
+  font-size: 24px;
+  margin: 0 10px;
+  height: 38px;
+  
+  img {
+    height: 100%;
+  }
+`;
 
 function Navbar() {
-    return (
-        <NavbarContainer>
-          <LogoContainer>
+  return (
+    <NavbarContainer>
+      <LogoContainer>
+        <Link to="/">
           <Logo src={logo} alt="Logo" />
-          </LogoContainer>
-          {/* <IconsContainer>
-            <Icon><FaHome /></Icon>
-            <Icon><FaTasks /></Icon>
-            <Icon><FaInfoCircle /></Icon>
-          </IconsContainer> */}
-        </NavbarContainer>
-      );
-  }
-  
-  export default Navbar;
+        </Link>
+      </LogoContainer>
+      <IconsContainer>
+        <Icon to="/projects">
+          <img src={projects_icon} alt="Projects icon"/>
+        </Icon>
+        <Icon to="/tasks">
+          <img src={tasks_icon} alt="Tasks icon"/>
+        </Icon>
+        <Icon to="/account">
+          <img src={account_icon} alt="Account icon"/>
+        </Icon>
+      </IconsContainer>
+    </NavbarContainer>
+  );
+}
+
+export default Navbar;
