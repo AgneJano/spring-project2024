@@ -5,6 +5,17 @@ import projects_icon from '../assets/projects_icon.svg';
 import tasks_icon from '../assets/tasks_icon.svg';
 import account_icon from '../assets/account_icon.svg';
 
+
+const MainContainer = styled.div`
+max-width: 1180px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-grow: 1; 
+  flex-shrink: 0; 
+`;
+
 const NavbarContainer = styled.nav`
   background-color: black;
   display: flex;
@@ -34,9 +45,12 @@ const Icon = styled(Link)`
   }
 `;
 
+
 function Navbar() {
   return (
+
     <NavbarContainer>
+       <MainContainer>
       <LogoContainer>
         <Link to="/">
           <Logo src={logo} alt="Logo" />
@@ -53,7 +67,9 @@ function Navbar() {
           <img src={account_icon} alt="Account icon"/>
         </Icon>
       </IconsContainer>
+      </MainContainer>
     </NavbarContainer>
+
   );
 }
 

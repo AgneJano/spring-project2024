@@ -5,7 +5,9 @@ const HomePageContainer = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 50px 150px;
+  padding: 50px 16px;
+  max-width: 1180px;
+  margin: 0 auto;
 `;
 
 const LeftColumn = styled.div`
