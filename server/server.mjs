@@ -4,7 +4,7 @@ import dotenv from 'dotenv'
 dotenv.config()
 
 import { connectDB } from './db/postgresConnection.mjs';
-import usersRouter from './routes/users.mjs'
+import usersRouter from './routes/index.mjs'
 
 const app = express();
 
@@ -13,12 +13,12 @@ const startServer = async () => {
         const message = await connectDB()
         console.log(message);
 
+        app.use(express.json());
+
         app.use(
             '/api/v1/planpro',
             usersRouter
         );
-
-        app.use(express.json());
 
         const PORT = process.env.PORT;
 
