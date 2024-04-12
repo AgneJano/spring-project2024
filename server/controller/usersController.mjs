@@ -60,3 +60,5 @@ const userController = {
 };
 
 export default userController;
+
+//istrinti
