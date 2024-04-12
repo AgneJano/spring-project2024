@@ -4,6 +4,7 @@ import logo from '../assets/logo.svg';
 import projects_icon from '../assets/projects_icon.svg';
 import tasks_icon from '../assets/tasks_icon.svg';
 import account_icon from '../assets/account_icon.svg';
+import { useState } from 'react';
 
 
 const MainContainer = styled.div`
@@ -26,7 +27,7 @@ const NavbarContainer = styled.nav`
 
 const LogoContainer = styled.div``;
 const Logo = styled.img`
-  height: 24px;
+  height: 23px;
 `;
 
 const IconsContainer = styled.div`
@@ -47,6 +48,8 @@ const Icon = styled(Link)`
 
 
 function Navbar() {
+
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   return (
 
     <NavbarContainer>
@@ -57,16 +60,20 @@ function Navbar() {
         </Link>
       </LogoContainer>
       <IconsContainer>
-        <Icon to="/projects">
-          <img src={projects_icon} alt="Projects icon"/>
-        </Icon>
-        <Icon to="/tasks">
-          <img src={tasks_icon} alt="Tasks icon"/>
-        </Icon>
-        <Icon to="/account">
-          <img src={account_icon} alt="Account icon"/>
-        </Icon>
-      </IconsContainer>
+          {isAuthenticated && (
+            <>
+              <Icon to="/projects">
+                <img src={projects_icon} alt="Projects icon"/>
+              </Icon>
+              <Icon to="/tasks">
+                <img src={tasks_icon} alt="Tasks icon"/>
+              </Icon>
+              <Icon to="/account">
+                <img src={account_icon} alt="Account icon"/>
+              </Icon>
+            </>
+          )}
+        </IconsContainer>
       </MainContainer>
     </NavbarContainer>
 
