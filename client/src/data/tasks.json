@@ -1,0 +1,33 @@
+[
+    {
+      "id": 1,
+      "name": "Task 1",
+      "category": "To Do"
+    },
+    {
+      "id": 2,
+      "name": "Task 2",
+      "category": "To Do"
+    },
+    {
+      "id": 3,
+      "name": "Task 3",
+      "category": "In Progress"
+    },
+    {
+      "id": 4,
+      "name": "Task 4",
+      "category": "In Progress"
+    },
+    {
+      "id": 5,
+      "name": "Task 5",
+      "category": "Done"
+    },
+    {
+      "id": 6,
+      "name": "Task 6",
+      "category": "Done"
+    }
+  ]
+  
