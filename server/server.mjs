@@ -1,10 +1,10 @@
 import express from 'express';
-import dotenv from 'dotenv'
+import dotenv from 'dotenv';
+import passport from './strategies/auth.mjs'
+import { connectDB } from './db/postgresConnection.mjs';
+import usersRouter from './routes/index.mjs';
 
 dotenv.config()
-
-import { connectDB } from './db/postgresConnection.mjs';
-import usersRouter from './routes/users.mjs'
 
 const app = express();
 
@@ -13,12 +13,13 @@ const startServer = async () => {
         const message = await connectDB()
         console.log(message);
 
+        app.use(express.json()); //must be before the route !!
+        app.use(passport.initialize());
+
         app.use(
             '/api/v1/planpro',
             usersRouter
         );
-
-        app.use(express.json());
 
         const PORT = process.env.PORT;
 
