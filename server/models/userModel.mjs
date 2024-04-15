@@ -5,16 +5,16 @@ const userModel = {
   createUser: async (newUser) => {
     try {
       const {
-        username,
+        name,
         email,
         password,
-        role = "user",
+        role = 'user',
         registered_on,
       } = newUser;
 
       const result = await pool.query(
-        "INSERT INTO users (username, email, password, role, registered_on) VALUES ($1, $2, $3, $4, $5) RETURNING *",
-        [username, email, password, role, registered_on]
+        'INSERT INTO users (name, email, password, registered_on, role) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+        [name, email, password, registered_on, role],
       );
       return result.rows[0];
     } catch (error) {
@@ -22,6 +22,19 @@ const userModel = {
       throw error;
     }
   },
+  // We need to check in DB, if there is no similar emails to register new user.
+  getUserByEmail: async ({ email }) => {
+    try {
+      const result = await pool.query('SELECT * FROM users WHERE email = $1', [
+        email,
+      ]);
+      return result.rows[0];
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  },
+
   login: async ({ email }) => {
     const result = await pool.query("SELECT * FROM users WHERE email = $1", [
       email

@@ -6,6 +6,7 @@ import usersRouter from './routes/index.mjs';
 
 dotenv.config()
 
+
 const app = express();
 
 const startServer = async () => {
@@ -33,3 +34,4 @@ const startServer = async () => {
 }
 
 startServer()
+//istrinti
