@@ -1,14 +1,18 @@
-import { useState } from 'react'
 import './App.css'
-import { Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import Navbar from './components/Navbar';
+import { Dashboard } from './dashboard/Dashboard';
 
 function App() {
-  const [count, setCount] = useState(0)
 
   return (
     <>
      <Navbar />
+    <Routes>
+    <Route path="/" element={<Dashboard/>} />
+    </Routes>
+    
+     
     </>
   )
 }
