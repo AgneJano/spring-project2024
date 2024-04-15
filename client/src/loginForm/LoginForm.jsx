@@ -1,17 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import styled from 'styled-components';
 import { useNavigate, Link } from "react-router-dom";
+import { useForm } from 'react-hook-form';
+import { AuthContext } from '../utils/AuthContext.jsx';
 
 const Container = styled.div`
   max-width: 400px;
   margin: 0 auto;
   padding: 20px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
+  // border: 1px solid #ccc;
+  // border-radius: 5px;
 `;
 
-const Title = styled.h1`
-  text-align: center;
+const Text = styled.p`
+  font-size: 16px;
+  margin-bottom: 20px;
+  font-family: 'Poppins', sans-serif;
+  line-height: 24px;
+  color: rgba(0, 0, 0, 0.5); /* Adjust the alpha value (0.8) to set the transparency */
+  text-align: justify-left;
 `;
 
 const Form = styled.form`
@@ -27,84 +34,93 @@ const FormGroup = styled.div`
 
 const Label = styled.label`
   margin-bottom: 5px;
+  font-size: 16px;
+  font-family: 'Poppins', sans-serif;
+  line-height: 24px;
+  color: rgba(0, 0, 0, 0.5); /* Adjust the alpha value (0.8) to set the transparency */
+  text-align: justify-left;
 `;
 
 const Input = styled.input`
   padding: 10px;
-  border: 1px solid #ccc;
+  border: 1px solid #DDDDDD;
   border-radius: 5px;
-  width: 80%;
+  max-width: 400px;
+  &::placeholder {
+    color: #d9d9d9;
+    font-size:1rem;
+  }
+  &:focus {
+    border-color: #000; /* Change to your desired color */
+    outline: none; /* Remove default outline */
+  }
 `;
 
 const Button = styled.button`
   padding: 10px;
   background-color: #FFC107;
   color: #fff;
-  border: none;
+  border: 1px solid #FFC107 ;
   border-radius: 5px;
   cursor: pointer;
-  width: 85%;
-
+  max-width: 400px;
   &:hover {
     background-color: #0056b3;
   }
 `;
 
 function LoginForm() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const navigate = useNavigate();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+  const { loginUser } = useContext(AuthContext);
+  const [serverError, setServerError] = useState(null);
 
-  const handleEmailChange = (e) => {
-    setEmail(e.target.value);
-  };
-
-  const handlePasswordChange = (e) => {
-    setPassword(e.target.value);
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // You can perform login/authentication logic here
-    console.log('Email:', email);
-    console.log('Password:', password);
-    // Reset the form
-    setEmail('');
-    setPassword('');
-    
-    // Navigate to the desired route after successful login
-    navigate('/projects');
+  const onSubmit = async (data) => {
+    try {
+      const result = await loginUser(data);
+      // jeigu gauname result ir result turi tokeną, tai nukreipiame vartotoją į dashboard puslapį arba admin-dashboard puslapį
+      if (result && result.token) {
+        navigate('/project');
+      }
+    }
+    catch (error) {
+      setServerError(error.message);
+    }
   };
 
   return (
     <Container>
-      <Title>Login</Title>
-      <Form onSubmit={handleSubmit}>
+      <Form onSubmit={handleSubmit(onSubmit)}>
         <FormGroup>
           <Label>Email address</Label>
           <Input
-            type="email"
-            placeholder="Enter email"
-            value={email}
-            onChange={handleEmailChange}
-            required
+            type="text"
+            name="login"
+            autoComplete="username" // Add this line
+            {...register('login', { required: 'Username is required' })}
           />
+          {errors.username && <p>{errors.username.message}</p>}
         </FormGroup>
 
         <FormGroup>
           <Label>Password</Label>
           <Input
             type="password"
-            placeholder="Password"
-            value={password}
-            onChange={handlePasswordChange}
-            required
+            name="password"
+            autoComplete="current-password"
+            {...register('password', { required: 'Password is required' })}
           />
+          {errors.password && <p>{errors.password.message}</p>}
         </FormGroup>
-
-        <Button type="submit">Sign in</Button>
+        {serverError && <p>{serverError}</p>} 
+        <Button type="submit">SIGN IN</Button>
+        <Text>Don't have an account? <Link to="/registration">Sign up</Link></Text>
       </Form>
-      <p>Don't have an account? <Link to="/register">Sign up</Link></p>
+
     </Container>
   );
 }
