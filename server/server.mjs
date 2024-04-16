@@ -1,28 +1,30 @@
-import express from 'express';
-import dotenv from 'dotenv';
-import cors from 'cors'; // Import the cors middleware
+import express from "express";
+import dotenv from "dotenv";
+import passport from "./strategies/auth.mjs";
+import { connectDB } from "./db/postgresConnection.mjs";
+import usersRouter from "./routes/index.mjs";
+import cors from "cors";
 
 dotenv.config();
-
-import { connectDB } from './db/postgresConnection.mjs';
-import usersRouter from './routes/index.mjs';
 
 const app = express();
 
 const startServer = async () => {
-    try {
-        const message = await connectDB();
-        console.log(message);
+  try {
+    const message = await connectDB();
+    console.log(message);
 
-        // Use cors middleware to enable CORS
-        app.use(cors());
+    app.use(express.json()); //must be before the route !!
+    app.use(passport.initialize());
+    // Allow requests from your frontend domain
+    app.use(
+      cors({
+        origin: "http://localhost:5173", // Change this to your frontend URL
+        credentials: true, // Allow cookies and authorization headers
+      })
+    );
 
-        app.use(express.json());
-
-        app.use(
-            '/api/v1/planpro',
-            usersRouter
-        );
+    app.use("/api/v1/planpro", usersRouter);
 
         const PORT = process.env.PORT || 1000;
 

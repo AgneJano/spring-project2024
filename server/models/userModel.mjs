@@ -1,7 +1,6 @@
-import { pool } from '../db/postgresConnection.mjs';
+import { pool } from "../db/postgresConnection.mjs";
 
 const userModel = {
-
   // registers new user to PlanPro.
   createUser: async (newUser) => {
     try {
@@ -23,7 +22,6 @@ const userModel = {
       throw error;
     }
   },
-
   // We need to check in DB, if there is no similar emails to register new user.
   getUserByEmail: async ({ email }) => {
     try {
@@ -36,7 +34,19 @@ const userModel = {
       throw error;
     }
   },
+
+  login: async ({ email }) => {
+    const result = await pool.query("SELECT * FROM users WHERE email = $1", [
+      email
+    ]);
+    console.log(result);
+    if (result.rows.length === 0) {
+      throw new Error("User not found");
+    }
+
+    const user = result.rows[0];
+    return user;
+  }
 };
 
 export default userModel;
-//istrinti
