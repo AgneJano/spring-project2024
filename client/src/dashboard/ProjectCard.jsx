@@ -82,28 +82,26 @@ export const ProjectCard = ({
   const url = getStatusSvgUrl(status);
 
   const onDeleteClick = async (projectId) => {
-    const url = "https://api.jsonbin.io/v3/b/661eb81fe41b4d34e4e55765";
-
-    try {
-      const response = await axios.delete(url, {
-        headers: {
-          "X-Master-Key":
-            "$2a$10$ep7mKSMiDETvfKp/AyhAEez73Ll2iqMLhJoQ3ze8q/En5oV69kXdC",
-          id: projectId,
-        },
-      });
-
-      if (response.status === 200) {
-        console.log(`Project with ID ${projectId} deleted successfully`);
-        return true;
-      } else {
-        console.error(`Failed to delete project with ID ${projectId}`);
-        return false;
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      return false;
-    }
+    // const url = "https://api.jsonbin.io/v3/b/661eb81fe41b4d34e4e55765";
+    // try {
+    //   const response = await axios.delete(url, {
+    //     headers: {
+    //       "X-Master-Key":
+    //         "$2a$10$ep7mKSMiDETvfKp/AyhAEez73Ll2iqMLhJoQ3ze8q/En5oV69kXdC",
+    //       id: projectId,
+    //     },
+    //   });
+    //   if (response.status === 200) {
+    //     console.log(`Project with ID ${projectId} deleted successfully`);
+    //     return true;
+    //   } else {
+    //     console.error(`Failed to delete project with ID ${projectId}`);
+    //     return false;
+    //   }
+    // } catch (error) {
+    //   console.error("Error:", error);
+    //   return false;
+    // }
   };
   return (
     <Container>
