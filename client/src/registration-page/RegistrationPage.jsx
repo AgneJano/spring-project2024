@@ -108,7 +108,8 @@ function RegistrationPage() {
     try {
       await registerUser(data);
       setSuccessMessage('Registration successful!');
-      navigate('/login');
+      //To do: fix path to login, when needed.
+      navigate('/');
     } catch (error) {
       if (error.response && error.response.status === 400) {
         setError('email', {
