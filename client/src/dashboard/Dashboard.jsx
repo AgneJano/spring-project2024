@@ -1,5 +1,5 @@
 import { ProjectCard } from "./ProjectCard";
-import { styled } from 'styled-components';
+import { styled } from "styled-components";
 import { useFetch } from "../fetching-data/UseFetch";
 import SyncLoader from "react-spinners/SyncLoader";
 import Search from "../components/Search";
@@ -13,8 +13,8 @@ const CardsContainer = styled.div`
   max-width: 77.5rem;
   margin: 1.875rem auto 0;
   justify-content: center;
-  @media (max-width: 48em){
-      padding: 0 1rem;
+  @media (max-width: 48em) {
+    padding: 0 1rem;
   }
 `;
 
@@ -42,35 +42,33 @@ const ButtonsContainer = styled.div`
         align-items: center
         padding: 0 1rem;
     }
-`
+`;
 
 export const Dashboard = () => {
-    const { data, loading } = useFetch('https://api.jsonbin.io/v3/b/661580e6acd3cb34a835ec31');
+  const { data, loading } = useFetch(
+    "https://api.jsonbin.io/v3/b/661eb81fe41b4d34e4e55765",
+  );
 
-    return (
-        <>
-            <Title>Projects</Title>
-            <ButtonsContainer>
-                <CreateButton buttonTitle={'Add project'} />
-                <Search/>
-                <Filter filterElement='projects'/>
-            </ButtonsContainer>
-            
-            <CardsContainer>
-                {loading ? (
-                    <LoadingContainer>
-                        <SyncLoader
-                            color={"#FFC107"}
-                            loading={loading}
-                            size={20}
-                        />
-                    </LoadingContainer>
-                ) : (
-                    data.record.projects.map((project, i) => (
-                        <ProjectCard key={`projectCard${i}`} {...project}/>
-                    ))
-                )}
-            </CardsContainer>
-        </>
-    );
+  return (
+    <>
+      <Title>Projects</Title>
+      <ButtonsContainer>
+        <CreateButton buttonTitle={"Add project"} />
+        <Search />
+        <Filter filterElement="projects" />
+      </ButtonsContainer>
+
+      <CardsContainer>
+        {loading ? (
+          <LoadingContainer>
+            <SyncLoader color={"#FFC107"} loading={loading} size={20} />
+          </LoadingContainer>
+        ) : (
+          data.record.projects.map((project, i) => (
+            <ProjectCard key={`projectCard${i}`} {...project} />
+          ))
+        )}
+      </CardsContainer>
+    </>
+  );
 };
