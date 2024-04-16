@@ -84,7 +84,7 @@ function LoginForm() {
       const result = await loginUser(data);
       // jeigu gauname result ir result turi tokeną, tai nukreipiame vartotoją į dashboard puslapį arba admin-dashboard puslapį
       if (result && result.token) {
-        navigate('/project');
+        navigate('/dashboard');
       }
     }
     catch (error) {
@@ -100,7 +100,7 @@ function LoginForm() {
           <Input
             type="text"
             name="login"
-            autoComplete="username" // Add this line
+            autoComplete="username"
             {...register('login', { required: 'Username is required' })}
           />
           {errors.username && <p>{errors.username.message}</p>}
