@@ -71,8 +71,12 @@ const StyledIcon = styled.img`
     }
 `
 
-export const ProjectCard = ({name, description, status, tasksLeft, totalTasks})=> {
+export const ProjectCard = ({id, name, description, status, tasksLeft, tasks})=> {
     const url = getStatusSvgUrl(status);
+
+    const onDeleteClick = (projectId)=>{
+console.log(projectId)
+    }
     return (
         <Container>
             <Header>
@@ -85,11 +89,14 @@ export const ProjectCard = ({name, description, status, tasksLeft, totalTasks})=
                 <Description>{description}</Description>
             </DescriptionContainer>
             <TaskContainer>
-                <TaskInfo>Tasks left: {tasksLeft}/{totalTasks}</TaskInfo>
+                <TaskInfo>Tasks left: {tasksLeft}/{tasks}</TaskInfo>
                 <ImageContainer>
                     {/* TO DO: funkcionalas */}
                     <StyledIcon src={editIcon} />
-                    <StyledIcon src={deleteIcon} />  
+                    <StyledIcon src={deleteIcon} onClick={() => {
+    console.log('Icon clicked'); // Add this line for debugging
+    onDeleteClick(id); 
+  }} />  
                 </ImageContainer>
             </TaskContainer>
         </Container>
