@@ -75,7 +75,7 @@ export const ProjectCard = ({id, name, description, status, tasksLeft, tasks})=>
     const url = getStatusSvgUrl(status);
 
     const onDeleteClick = (projectId)=>{
-console.log(projectId)
+        console.log(projectId)
     }
     return (
         <Container>
