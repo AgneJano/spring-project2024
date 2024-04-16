@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-// import LoginForm from './LoginForm'; 
+import LoginForm from "../loginForm/LoginForm"
 
 const HomePageContainer = styled.div`
   display: flex;
@@ -45,7 +45,7 @@ function HomePage() {
         </Text>
       </LeftColumn>
       <RightColumn>
-        {/* <LoginForm /> */}
+     <LoginForm /> 
       </RightColumn>
     </HomePageContainer>
   );
