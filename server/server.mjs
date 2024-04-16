@@ -14,8 +14,6 @@ const startServer = async () => {
     const message = await connectDB();
     console.log(message);
 
-    app.use(express.json()); //must be before the route !!
-    app.use(passport.initialize());
     // Allow requests from your frontend domain
     app.use(
       cors({
@@ -24,17 +22,20 @@ const startServer = async () => {
       })
     );
 
+    app.use(express.json()); //must be before the route !!
+    app.use(passport.initialize());
+
     app.use("/api/v1/planpro", usersRouter);
 
-    const PORT = process.env.PORT;
+    const PORT = process.env.PORT || 1000;
 
     app.listen(PORT, () => {
-      console.log("Server is listening on port 1000");
+      console.log(`Server is listening on port ${PORT}`);
     });
+
   } catch (error) {
-    console.error("Failed to connect to the server or database", error);
+    console.error('Failed to connect to the server or database', error);
   }
 };
 
 startServer();
-

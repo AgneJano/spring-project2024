@@ -6,19 +6,21 @@ import Footer from "./components/Footer";
 import ProjectPage from "./project-page/ProjectPage";
 import { AuthProvider } from "./utils/AuthContext";
 import { Dashboard } from "./dashboard/Dashboard";
+import RegistrationPage from './registration-page/RegistrationPage';
 
 function App() {
   return (
     <>
-      <AuthProvider>
+      {/* <AuthProvider> */}
         <Navbar />
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/project" element={<ProjectPage />} />
+          <Route path='/registration' element={<RegistrationPage />} />
         </Routes>
         <Footer />
-      </AuthProvider>
+      {/* </AuthProvider> */}
     </>
   );
 }
