@@ -44,7 +44,7 @@ const ButtonsContainer = styled.div`
     }
 `;
 
-export const Dashboard = () => {
+export const Projects = () => {
   const { data, loading } = useFetch(
     "https://api.jsonbin.io/v3/b/661eb81fe41b4d34e4e55765",
   );
