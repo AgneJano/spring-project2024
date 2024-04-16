@@ -71,6 +71,7 @@ const StyledIcon = styled.img`
     }
 `
 
+
 export const ProjectCard = ({id, name, description, status, tasksLeft, tasks})=> {
     const url = getStatusSvgUrl(status);
 
