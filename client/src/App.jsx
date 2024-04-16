@@ -1,32 +1,37 @@
 import { Routes, Route, useNavigate } from "react-router-dom";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import Navbar from "./components/Navbar";
 import HomePage from "./home-page/HomePage";
 import Footer from "./components/Footer";
 import ProjectPage from "./project-page/ProjectPage";
-import { Dashboard } from "./dashboard/Dashboard";
+import { Dashboard } from "./dashboard/Dasboard";
 import RegistrationPage from "./registration-page/RegistrationPage";
 import { AuthContext } from "./utils/AuthContext";
+import { Projects } from "./projects/Projects";
 
 function App() {
   const { isAuthenticated } = useContext(AuthContext);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    isAuthenticated;
+  }, [isAuthenticated, navigate]);
+
   return (
     <>
       <Navbar />
       <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/registration" element={<RegistrationPage />} />
         {isAuthenticated ? (
-          <Route path="/projects" element={<Dashboard />} />
+          <>
+            <Route path="/home" element={<Dashboard />} />
+            <Route path="/projects" element={<Projects />} />
+            <Route path="/project" element={<ProjectPage />} />
+          </>
         ) : (
-          navigate("/")
-        )}
-        {isAuthenticated ? (
-          <Route path="/project" element={<ProjectPage />} />
-        ) : (
-          navigate("/")
+          <>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/registration" element={<RegistrationPage />} />
+          </>
         )}
       </Routes>
       <Footer />

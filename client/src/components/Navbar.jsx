@@ -1,5 +1,5 @@
-import { Link } from "react-router-dom";
-import styled from "styled-components";
+import { Link, useNavigate } from "react-router-dom";
+import { styled } from "styled-components";
 import logo from "../assets/logo.svg";
 import projects_icon from "../assets/projects_icon.svg";
 import tasks_icon from "../assets/tasks_icon.svg";
@@ -78,7 +78,7 @@ const DropdownItem = styled.div`
 function Navbar() {
   const { isAuthenticated, logoutUser } = useContext(AuthContext);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
+  const navigate = useNavigate();
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
@@ -86,6 +86,7 @@ function Navbar() {
   const handleLogout = () => {
     logoutUser();
     setIsMenuOpen(false);
+    navigate("/");
   };
 
   return (
