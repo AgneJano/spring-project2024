@@ -1,12 +1,14 @@
 import styled from 'styled-components';
-import editIcon from '../assets/edit.svg';
-import trashIcon from '../assets/trash.svg';
+import editIcon from "../assets/icons/edit.svg";
+import deleteIcon from "../assets/icons/delete.svg";
+
+
 
 const ColumnContainer = styled.div`
   flex: 1;
-  margin-right: 20px;
   border-radius: 5px;
   padding: 10px;
+  margin: 1.875rem auto 0;
 `;
 
 const ColumnTitle = styled.h2`
@@ -48,22 +50,6 @@ const TaskDate = styled.span`
   margin-bottom: 5px;
 `;
 
-const IconsContainer = styled.div`
-  display: flex;
-  gap: 10px;
-`;
-
-const IconButton = styled.button`
-  background: none;
-  border: none;
-  cursor: pointer;
-`;
-
-const Icon = styled.img`
-  width: 20px;
-  height: 20px;
-`;
-
 const Line = styled.div`
   position: absolute;
   bottom: 0;
@@ -73,16 +59,47 @@ const Line = styled.div`
   background-color: #eee;
 `;
 
-function TaskColumn({ title, tasks }) {
-  const handleEditClick = (taskId) => {
-    // Redagavimas
-    console.log('Edit task with ID:', taskId);
+const ImageContainer = styled.p`
+  display: flex;
+  gap: 0.5rem;
+`;
+const StyledIcon = styled.img`
+  &:hover {
+    filter: brightness(0.5);
+    transform: scale(0.9);
+  }
+`;
+
+
+
+
+function TaskColumn({ title, tasks, id, date }) {
+
+  const onDeleteClick = async (taskId) => {
+    // const url = "https://api.jsonbin.io/v3/b/661eb81fe41b4d34e4e55765";
+    // try {
+    //   const response = await axios.delete(url, {
+    //     headers: {
+    //       "X-Master-Key":
+    //         "$2a$10$ep7mKSMiDETvfKp/AyhAEez73Ll2iqMLhJoQ3ze8q/En5oV69kXdC",
+    //       id: taskId,
+    //     },
+    //   });
+    //   if (response.status === 200) {
+    //     console.log(`Task with ID ${taskId} deleted successfully`);
+    //     return true;
+    //   } else {
+    //     console.error(`Failed to delete task with ID ${taskId}`);
+    //     return false;
+    //   }
+    // } catch (error) {
+    //   console.error("Error:", error);
+    //   return false;
+    // }
   };
 
-  const handleDeleteClick = (taskId) => {
-    // Pašalinimas
-    console.log('Delete task with ID:', taskId);
-  };
+
+
 
   return (
     <ColumnContainer>
@@ -94,14 +111,23 @@ function TaskColumn({ title, tasks }) {
               <TaskDate>{task.date}</TaskDate>
               <TaskName>{task.name}</TaskName>
             </TaskContent>
-            <IconsContainer>
-              <IconButton onClick={() => handleEditClick(task.id)}>
-                <Icon src={editIcon} alt="Edit" />
-              </IconButton>
-              <IconButton onClick={() => handleDeleteClick(task.id)}>
-                <Icon src={trashIcon} alt="Trash" />
-              </IconButton>
-            </IconsContainer>
+{/* Kopijuota iš Santos */}
+            <ImageContainer>
+              
+          {/* TO DO: funkcionalas */}
+          <StyledIcon src={editIcon} />
+          <StyledIcon
+            src={deleteIcon}
+            onClick={() => {
+              console.log("Icon clicked"); // Add this line for debugging
+              onDeleteClick(id);
+            }}
+          />
+        </ImageContainer>
+
+
+
+            
             <Line />
           </TaskItem>
         ))}

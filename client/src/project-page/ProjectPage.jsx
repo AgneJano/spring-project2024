@@ -2,8 +2,9 @@ import styled from 'styled-components';
 import TaskColumn from '../components/TaskColumn';
 import tasksData from '../data/tasks.json';
 import downloadIcon from '../assets/download.svg';
-import PlusIcon from '../assets/plus.svg';
-import SearchIcon from '../assets/search.svg';
+import Search from '../components/Search';
+import CreateButton from '../components/CreateButton';
+import { getStatusSvgUrl, getTaskIcons } from "../mainFunctions";
 
 const ProjectPageContainer = styled.div`
   max-width: 1180px;
@@ -11,74 +12,20 @@ const ProjectPageContainer = styled.div`
   padding: 20px;
 `;
 
-const ProjectTitle = styled.h1`
-  font-size: 24px;
-  margin-bottom: 10px;
-  margin-top: 66px;
-  font-family: 'Poppins', sans-serif;
-`;
-
-const ProjectStatus = styled.div`
-  font-size: 16px;
-  margin-bottom: 10px;
-  font-family: 'Poppins', sans-serif;
-`;
-
-const ProjectDescription = styled.p`
-  margin-bottom: 20px;
-  font-family: 'Poppins', sans-serif;
-  line-height: 1.5; 
-`;
-
 const ButtonContainer = styled.div`
-  margin-bottom: 20px;
+  margin-bottom: 15px;
 `;
 
-const ButtonGroup = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 10px;
-`;
-
-const AddTaskButton = styled.button`
-  background-color: #ffffff;
-  color: #D9D9D9;
-  border: 1px solid #DDDDDD;
-  border-radius: 4px;
-  padding: 8px 20px;
-  cursor: pointer;
-  font-family: 'Poppins', sans-serif;
-  display: flex;
-  align-items: center;
-`;
-
-const PlusIconWrapper = styled.span`
-display: flex;
-align-items: center;
-justify-content: center; 
-margin-right: 5px;
-`;
-
-const SearchInputContainer = styled.div`
-  position: relative;
-`;
-
-const SearchIconImg = styled.img`
-  position: absolute;
-  left: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-`;
-
-const SearchInput = styled.input`
-color: #D9D9D9;
-  padding: 8px 30px 8px 35px;
-  border: 1px solid #D9D9D9;
-  font-family: 'Poppins', sans-serif;
-  border-radius: 4px;
-  width: 200px;
-  &::placeholder {
-    color: #D9D9D9;
+const ButtonsContainer = styled.div`
+    display: flex;
+   gap: 0.625rem;
+   max-width: 77.5rem;
+   margin: 0 auto;
+   @media (max-width: 48em){
+        flex-direction: column;
+        align-items: center
+        padding: 0 1rem;
+    }
 `;
 
 const DownloadIcon = styled.img`
@@ -95,56 +42,78 @@ const ColumnsContainer = styled.div`
 
 const TaskColumnWrapper = styled.div`
   flex: 1;
-  border: 1px solid #D9D9D9; 
+  border: 1px solid #d9d9d9;
   border-radius: 4px;
   padding: 10px;
-  margin-right: 10px; 
+  margin-right: 15px;
 `;
 
-function ProjectPage() {
+const StatusBubble = styled.img`
+  height: 1.375rem;
+  width: 1.375rem;
+`;
+
+
+const Title = styled.p`
+  font-weight: 500;
+  font-size: 1.25rem;
+`;
+
+const DescriptionTitle = styled.p`
+  font-weight: 500;
+  font-size: 1rem;
+`;
+
+const Description = styled.p`
+  font-size: 1rem;
+  line-height: 1.25rem;
+`;
+
+const DescriptionContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.313rem;
+  max-height: 9.375rem;
+  height: 100%;
+`;
+
+
+function ProjectPage( {status, name, description} ) {
+
   const tasksToDo = tasksData.filter((task) => task.category === 'To Do');
   const tasksInProgress = tasksData.filter((task) => task.category === 'In Progress');
   const tasksDone = tasksData.filter((task) => task.category === 'Done');
-  
+
+  const url = getStatusSvgUrl(status);
+  const urlTask = getTaskIcons({status});
+
   return (
     <ProjectPageContainer>
-      <ProjectTitle>Project Name</ProjectTitle>
-      <ProjectStatus>In Progress</ProjectStatus>
-      <ProjectDescription>
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed vestibulum, libero ut faucibus bibendum, sapien
-        nisi sagittis massa, sit amet cursus mauris libero eget nunc. Integer nec turpis in mi consequat lobortis.
-        Nullam vitae mi id enim lacinia sodales. Duis ultricies nunc nec nisl cursus, eget fermentum sapien fringilla.
-        Sed ac sapien vel ligula congue porta. Vivamus tincidunt vehicula sapien, sit amet tempus leo efficitur at.
-        Suspendisse potenti. Sed sed posuere tortor. Sed congue magna eget erat vehicula, nec lobortis risus vehicula.
-        Sed vel velit sed risus condimentum maximus. Donec hendrerit felis et odio interdum efficitur. Cras id suscipit
-        elit.
-      </ProjectDescription>
+      <StatusBubble src={url} alt="Project status bubble" />
+      <Title>{name}</Title>
+      <DescriptionContainer>
+        <DescriptionTitle>Description</DescriptionTitle>
+        {/* TO DO: max simboliu su tarpais 255, reiks kazkaip trimint desc jeigu bus ilgenis */}
+        <Description>{description}</Description>
+      </DescriptionContainer>
       <ButtonContainer>
-        <ButtonGroup>
-          <AddTaskButton>
-            <PlusIconWrapper>
-              <img src={PlusIcon} alt="Add Task" />
-            </PlusIconWrapper>
-            Add Task
-          </AddTaskButton>
-          <SearchInputContainer>
-            <SearchIconImg src={SearchIcon} alt="Search" />
-            <SearchInput type="text" placeholder="Search..." />
-          </SearchInputContainer>
+        <ButtonsContainer>
+          <CreateButton buttonTitle={'Add task'} />
+          <Search />
           <DownloadIcon src={downloadIcon} alt="Download" />
-        </ButtonGroup>
+        </ButtonsContainer>
       </ButtonContainer>
       <ColumnsContainer>
-  <TaskColumnWrapper>
-    <TaskColumn title="To Do" tasks={tasksToDo} />
-  </TaskColumnWrapper>
-  <TaskColumnWrapper>
-    <TaskColumn title="In Progress" tasks={tasksInProgress} />
-  </TaskColumnWrapper>
-  <TaskColumnWrapper>
-    <TaskColumn title="Done" tasks={tasksDone} />
-  </TaskColumnWrapper>
-</ColumnsContainer>
+        <TaskColumnWrapper>
+          <TaskColumn title="To Do" tasks={tasksToDo} />
+        </TaskColumnWrapper>
+        <TaskColumnWrapper>
+          <TaskColumn title="In Progress" tasks={tasksInProgress} />
+        </TaskColumnWrapper>
+        <TaskColumnWrapper>
+          <TaskColumn title="Done" tasks={tasksDone} />
+        </TaskColumnWrapper>
+      </ColumnsContainer>
     </ProjectPageContainer>
   );
 }
