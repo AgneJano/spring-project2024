@@ -37,7 +37,7 @@ const DescriptionTitle = styled.p`
 `;
 
 const Description = styled.p`
-  font-size: 1rem;
+  font-size: 0.9rem;
   line-height: 1.25rem;
 `;
 
@@ -103,6 +103,14 @@ export const ProjectCard = ({
     //   return false;
     // }
   };
+  const truncateDescription = (description) => {
+    if (description.length <= 255) {
+      return description;
+    } else {
+      const lastSpaceIndex = description.lastIndexOf(" ", 255);
+      return description.substring(0, lastSpaceIndex).trim() + "...";
+    }
+  };
   return (
     <Container>
       <Header>
@@ -112,7 +120,7 @@ export const ProjectCard = ({
       <DescriptionContainer>
         <DescriptionTitle>Description</DescriptionTitle>
         {/* TO DO: max simboliu su tarpais 255, reiks kazkaip trimint desc jeigu bus ilgenis */}
-        <Description>{description}</Description>
+        <Description>{truncateDescription(description)}</Description>
       </DescriptionContainer>
       <TaskContainer>
         <TaskInfo>

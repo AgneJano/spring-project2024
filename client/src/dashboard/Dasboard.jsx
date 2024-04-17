@@ -1,4 +1,6 @@
 import { styled } from "styled-components";
+import { useContext } from "react";
+import { AuthContext } from "../utils/AuthContext";
 
 const Title = styled.p`
   font-size: 2rem;
@@ -8,9 +10,12 @@ const Title = styled.p`
 `;
 
 export const Dashboard = () => {
+  const { user } = useContext(AuthContext);
+  console.log(user);
   return (
-    <>
-      <Title>TODO DASHBOARD</Title>
-    </>
+    <div>
+      <h1>Welcome, {user.name}!</h1>
+      <p>This is your user home page.</p>
+    </div>
   );
 };
