@@ -1,7 +1,8 @@
 import styled from 'styled-components';
 
 const FooterContainer = styled.footer`
-  padding: 10px 20px;
+padding-top: 3rem;
+padding-bottom: 1rem;
   text-align: center;
   font-family: 'Poppins', sans-serif;
   font-size: 13px;
