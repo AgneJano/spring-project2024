@@ -12,18 +12,18 @@ const RegistrationContainer = styled.div`
   margin: 0 auto;
   align-items: center;
   width: 100%;
-  max-width: 600px;
+  max-width: 400px; 
   font-family: "Poppins", sans-serif;
   line-height: 36px;
-  font-size: 30px;
+  font-size: 20px; 
   color: #666666;
-  padding: 90px 90px;
+  padding: 50px 30px; 
 `;
 
 const FormTitle = styled.p`
   color: #333333;
   font-weight: 400;
-  font-size: 32px;
+  font-size: 1.5rem;
 `;
 
 const Form = styled.form`
@@ -38,7 +38,7 @@ const FormField = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
-  margin-top: 24px;
+  margin-top: 16px;
 `;
 
 const Label = styled.label`
@@ -48,13 +48,13 @@ const Label = styled.label`
 `;
 
 const Input = styled.input`
-  height: 46px;
+  height: 40px;
   padding: 5px;
   border: 1px solid rgba(221, 221, 221, 1);
   border-radius: 4px;
   outline: none;
   color: #333333;
-  font-size: 18px;
+  font-size: 16px;
 
   &:focus {
     border-color: #000;
@@ -64,17 +64,17 @@ const Input = styled.input`
 
 const SubmitButton = styled.button`
   width: 100%;
-  height: 50px;
+  height: 45px;
   padding: 10px;
   background-color: #ffc107;
   color: #ffffff;
   font-weight: 600;
-  font-size: 16px;
+  font-size: 0.9rem;
   border: none;
   border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.3s ease;
-  margin-top: 30px;
+  margin-top: 20px;
 
   &:hover {
     background-color: #b38600;
@@ -95,6 +95,7 @@ const FormForSignIn = styled.p`
 const ErrorMessage = styled.p`
   color: #990000;
   line-height: 20px;
+  font-size: 13px;
 `;
 
 const SignLink = styled(Link)`
@@ -159,12 +160,12 @@ function RegistrationPage() {
             })}
           />
           {errors.name && (
-            <ErrorMessage>Username is required and must be between 6 and 32 characters.</ErrorMessage>
+            <ErrorMessage>Username is required and must be between 6 and 32 characters</ErrorMessage>
           )}
         </FormField>
 
         <FormField>
-          <Label htmlFor="email">Email Address</Label>
+          <Label htmlFor="email">Email address</Label>
           <Input type="email" {...register("email", {
             required: true,
             pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
@@ -188,7 +189,7 @@ function RegistrationPage() {
           />
           {errors.password && (
             <ErrorMessage>Password must contain at least one uppercase letter, one lowercase letter,
-              one number, and one special character.</ErrorMessage>
+              one number, and one special character</ErrorMessage>
           )}
         </FormField>
 
