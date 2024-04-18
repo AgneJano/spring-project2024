@@ -1,5 +1,5 @@
-import { Link, useNavigate } from "react-router-dom";
-import { styled } from "styled-components";
+import { Link } from "react-router-dom";
+import styled from "styled-components";
 import logo from "../assets/logo.svg";
 import projects_icon from "../assets/projects_icon.svg";
 import tasks_icon from "../assets/tasks_icon.svg";
@@ -15,7 +15,7 @@ const MainContainer = styled.div`
   align-items: center;
   flex-grow: 1;
   flex-shrink: 0;
-  padding: 6px 20px;
+  // padding: 6px 20px;
 `;
 
 const NavbarContainer = styled.nav`
@@ -24,6 +24,7 @@ const NavbarContainer = styled.nav`
   justify-content: space-between;
   align-items: center;
   padding: 6px 20px;
+  height: 50px;
 `;
 
 const LogoContainer = styled.div``;
@@ -34,6 +35,8 @@ const Logo = styled.img`
 const IconsContainer = styled.div`
   display: flex;
   align-items: center;
+  position: relative;
+  height: 100%;
 `;
 
 const Icon = styled(Link)`
@@ -57,28 +60,45 @@ const DropdownMenu = styled.div`
 const DropdownContent = styled.div`
   display: ${(props) => (props.isOpen ? "block" : "none")};
   position: absolute;
-  background-color: #f9f9f9;
-  min-width: 160px;
-  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  background-color: white;
+  border: 1px solid #ddd; 
+  padding: 8px 0;
+  min-width: 120px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
   z-index: 1;
+  font-family: 'Poppins', sans-serif;
 `;
 
 const DropdownItem = styled.div`
-  padding: 12px 16px;
-  text-decoration: none;
+  padding: 10px 20px;
   color: black;
   display: block;
   cursor: pointer;
   width: 100%;
+  a {
+    text-decoration: none; 
+    color: black; 
+    font-family: 'Poppins', sans-serif;
+    &:hover {
+      color: #A9A9A9;
+    }
+  }
+`;
+
+const LogoutLink = styled(Link)`
+  text-decoration: none;
+  color: black;
+  font-family: 'Poppins', sans-serif;
+
   &:hover {
-    background-color: #f1f1f1;
+    color: #A9A9A9;
   }
 `;
 
 function Navbar() {
   const { isAuthenticated, logoutUser } = useContext(AuthContext);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const navigate = useNavigate();
+
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
@@ -86,7 +106,6 @@ function Navbar() {
   const handleLogout = () => {
     logoutUser();
     setIsMenuOpen(false);
-    navigate("/");
   };
 
   return (
@@ -118,9 +137,11 @@ function Navbar() {
                 </Icon>
                 <DropdownContent isOpen={isMenuOpen}>
                   <DropdownItem>
-                    <Link to="/profile">Your profile</Link>
+                    <Link to="/profile">Profile</Link>
                   </DropdownItem>
-                  <DropdownItem onClick={handleLogout}>Log out</DropdownItem>
+                  <DropdownItem onClick={handleLogout}>
+                    <LogoutLink to="/logout">Log out</LogoutLink>
+                  </DropdownItem>
                 </DropdownContent>
               </DropdownMenu>
             </>

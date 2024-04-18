@@ -2,38 +2,44 @@
     {
       "id": 1,
       "name": "Task 1",
-      "category": "To Do",
-      "date": "2024-04-15"
+      "status": "to-do",
+      "date": "2024-04-15",
+      "priority": "high"
     },
     {
       "id": 2,
       "name": "Task 2",
-      "category": "To Do",
-      "date": "2024-04-15"
+      "status": "to-do",
+      "date": "2024-04-15",
+      "priority": "medium"
     },
     {
       "id": 3,
       "name": "Task 3",
-      "category": "In Progress",
-      "date": "2024-04-15"
+      "status": "in-progress",
+      "date": "2024-04-15",
+      "priority": "low"
     },
     {
       "id": 4,
       "name": "Task 4",
-      "category": "In Progress",
-      "date": "2024-04-15"
+      "status": "in-progress",
+      "date": "2024-04-15",
+      "priority": "medium"
     },
     {
       "id": 5,
       "name": "Task 5",
-      "category": "Done",
-      "date": "2024-04-15"
+      "status": "done",
+      "date": "2024-04-15",
+      "priority": "medium"
     },
     {
       "id": 6,
       "name": "Task 6",
-      "category": "Done",
-      "date": "2024-04-15"
+      "status": "done",
+      "date": "2024-04-15",
+      "priority": "medium"
     }
   ]
   
