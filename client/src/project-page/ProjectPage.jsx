@@ -4,12 +4,12 @@ import tasksData from '../data/tasks.json';
 import downloadIcon from '../assets/download.svg';
 import Search from '../components/Search';
 import CreateButton from '../components/CreateButton';
-import { getStatusSvgUrl, getTaskIcons } from "../mainFunctions";
+import { getStatusSvgUrl } from '../mainFunctions';
 
 const ProjectPageContainer = styled.div`
   max-width: 1180px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 4.3rem 0 1.25rem;
 `;
 
 const ButtonContainer = styled.div`
@@ -21,6 +21,7 @@ const ButtonsContainer = styled.div`
    gap: 0.625rem;
    max-width: 77.5rem;
    margin: 0 auto;
+   padding: 4rem 0 0;
    @media (max-width: 48em){
         flex-direction: column;
         align-items: center
@@ -53,20 +54,22 @@ const StatusBubble = styled.img`
   width: 1.375rem;
 `;
 
-
 const Title = styled.p`
   font-weight: 500;
   font-size: 1.25rem;
+  font-family: 'Poppins', sans-serif;
 `;
 
 const DescriptionTitle = styled.p`
   font-weight: 500;
   font-size: 1rem;
+  font-family: 'Poppins', sans-serif;
 `;
 
 const Description = styled.p`
   font-size: 1rem;
   line-height: 1.25rem;
+  font-family: 'Poppins', sans-serif;
 `;
 
 const DescriptionContainer = styled.div`
@@ -77,20 +80,25 @@ const DescriptionContainer = styled.div`
   height: 100%;
 `;
 
+const Header = styled.div`
+  display: flex;
+  gap: 0.625rem;
+  padding-bottom: 1.875rem;
+`;
 
-function ProjectPage( {status, name, description} ) {
-
-  const tasksToDo = tasksData.filter((task) => task.category === 'To Do');
-  const tasksInProgress = tasksData.filter((task) => task.category === 'In Progress');
-  const tasksDone = tasksData.filter((task) => task.category === 'Done');
+function ProjectPage({ status, name, description }) {
+  const tasksToDo = tasksData.filter((task) => task.status === 'to-do');
+  const tasksInProgress = tasksData.filter((task) => task.status === 'in-progress');
+  const tasksDone = tasksData.filter((task) => task.status === 'done');
 
   const url = getStatusSvgUrl(status);
-  const urlTask = getTaskIcons({status});
 
   return (
     <ProjectPageContainer>
-      <StatusBubble src={url} alt="Project status bubble" />
-      <Title>{name}</Title>
+      <Header>
+        <StatusBubble src={url} alt="Project status bubble" />
+        <Title>{name}</Title>
+      </Header>
       <DescriptionContainer>
         <DescriptionTitle>Description</DescriptionTitle>
         {/* TO DO: max simboliu su tarpais 255, reiks kazkaip trimint desc jeigu bus ilgenis */}
@@ -108,7 +116,7 @@ function ProjectPage( {status, name, description} ) {
           <TaskColumn title="To Do" tasks={tasksToDo} />
         </TaskColumnWrapper>
         <TaskColumnWrapper>
-          <TaskColumn title="In Progress" tasks={tasksInProgress} />
+          <TaskColumn title="In progress" tasks={tasksInProgress} />
         </TaskColumnWrapper>
         <TaskColumnWrapper>
           <TaskColumn title="Done" tasks={tasksDone} />

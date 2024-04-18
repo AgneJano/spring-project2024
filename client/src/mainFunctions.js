@@ -15,19 +15,19 @@ export const getStatusSvgUrl = (projectStatus)=> {
 };
 
 
-export const getTaskIcons = (taskStatus, priority) => {
+export const getTaskIcons = (status, priority) => {
     let statusIcon = '';
     let priorityIcon = '';
 
-    switch (taskStatus) {
+    switch (status) {
         case 'in-progress':
-            statusIcon = "./src/assets/task-status-bubbles-priority/inProgress.svg";
+            statusIcon = "./src/assets/status-bubbles/inProgress.svg";
             break;
         case 'to-do':
-            statusIcon = "./src/assets/task-status-bubbles-priority/toDo.svg";
+            statusIcon = "./src/assets/status-bubbles/toDo.svg";
             break;
         case 'done':
-            statusIcon = "./src/assets/task-status-bubbles-priority/done.svg";
+            statusIcon = "./src/assets/status-bubbles/done.svg";
             break;
     }
 
