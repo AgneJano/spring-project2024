@@ -2,7 +2,7 @@ import { useState } from "react";
 import styled from "styled-components";
 
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { registerUser } from "../api/apis.js";
 
 const RegistrationContainer = styled.div`
@@ -12,7 +12,7 @@ const RegistrationContainer = styled.div`
   margin: 0 auto;
   align-items: center;
   width: 100%;
-  max-width: 535px;
+  max-width: 600px;
   font-family: "Poppins", sans-serif;
   line-height: 36px;
   font-size: 30px;
@@ -20,8 +20,10 @@ const RegistrationContainer = styled.div`
   padding: 90px 90px;
 `;
 
-const FormTitle = styled.div`
+const FormTitle = styled.p`
   color: #333333;
+  font-weight: 400;
+  font-size: 32px;
 `;
 
 const Form = styled.form`
@@ -32,14 +34,18 @@ const Form = styled.form`
 `;
 
 const FormField = styled.div`
-  gap: 4px;
   font-size: 16px;
   display: flex;
   flex-direction: column;
   width: 100%;
+  margin-top: 24px;
 `;
 
-const Label = styled.label``;
+const Label = styled.label`
+  height: 24px;
+  margin-bottom: 7px;
+  font-size: 16px;
+`;
 
 const Input = styled.input`
   height: 46px;
@@ -68,26 +74,36 @@ const SubmitButton = styled.button`
   border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  margin-top: 30px;
 
   &:hover {
     background-color: #b38600;
   }
 `;
 
-const FormMessage = styled.div`
-  max-width: 535px;
-  width: 100%;
-  font-size: 16px;
-  margin-bottom: 30px;
-`;
-
-const FormForSignIn = styled.div`
+const FormForSignIn = styled.p`
   display: flex;
   max-width: 535px;
   width: 100%;
   font-size: 16px;
   justify-content: center;
   margin-top: 15px;
+  align-items: center;
+  gap: 10px;
+`;
+
+const ErrorMessage = styled.p`
+  color: #990000;
+  line-height: 20px;
+`;
+
+const SignLink = styled(Link)`
+  color: #666666;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
 `;
 
 function RegistrationPage() {
@@ -130,7 +146,7 @@ function RegistrationPage() {
   return (
     <RegistrationContainer>
       <FormTitle>
-        <h2>Create an account</h2>
+        Create an account
       </FormTitle>
       <Form onSubmit={handleSubmit(onSubmit)}>
         <FormField>
@@ -139,18 +155,24 @@ function RegistrationPage() {
             {...register("name", {
               required: true,
               minLength: 6,
-              maxLength: 40,
+              maxLength: 32,
             })}
           />
           {errors.name && (
-            <p>Username is required and must be between 6 and 32 characters</p>
+            <ErrorMessage>Username is required and must be between 6 and 32 characters.</ErrorMessage>
           )}
         </FormField>
 
         <FormField>
           <Label htmlFor="email">Email Address</Label>
-          <Input type="email" {...register("email", { required: true })} />
-          {errors.email && <p>{errors.email.message}</p>}
+          <Input type="email" {...register("email", {
+            required: true,
+            pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+          })}
+          />
+          {errors.email && (
+            <ErrorMessage>{errors.email.message}</ErrorMessage>
+          )}
         </FormField>
 
         <FormField>
@@ -161,10 +183,12 @@ function RegistrationPage() {
               required: true,
               minLength: 8,
               maxLength: 128,
+              pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&~#^_+=\-';,./|":<>?])[A-Za-z\d@$!%*?&~#^_+=\-';,./|":<>?]{8,128}$/,
             })}
           />
           {errors.password && (
-            <p>Password is required and must be between 8 and 128 characters</p>
+            <ErrorMessage>Password must contain at least one uppercase letter, one lowercase letter,
+              one number, and one special character.</ErrorMessage>
           )}
         </FormField>
 
@@ -174,25 +198,17 @@ function RegistrationPage() {
             type="password"
             {...register("repeatPassword", { required: true })}
           />
-          {errors.repeatPassword && <p>Please repeat your password</p>}
+          {errors.repeatPassword && <ErrorMessage>{errors.repeatPassword.message}</ErrorMessage>}
         </FormField>
 
-        <FormMessage>
-          <p>There will be a message</p>
-        </FormMessage>
         <SubmitButton type="submit">CREATE AN ACCOUNT</SubmitButton>
       </Form>
       <FormForSignIn>
-        <p>
-          {serverError ? (
-            <p>{serverError}</p>
-          ) : (
-            successMessage && <p>{successMessage}</p>
-          )}
-        </p>
+        Do you already have an account?  <SignLink to='/'>Sign in</SignLink>
       </FormForSignIn>
     </RegistrationContainer>
   );
 }
 
 export default RegistrationPage;
+
