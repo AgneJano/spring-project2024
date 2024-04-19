@@ -134,7 +134,7 @@ function Navbar() {
                     <Link to="/profile">Profile</Link>
                   </DropdownItem>
                   <DropdownItem onClick={handleLogout}>
-                    <LogoutLink to="/logout">Log out</LogoutLink>
+                    <LogoutLink to="/">Log out</LogoutLink>
                   </DropdownItem>
                 </DropdownContent>
               </DropdownMenu>
