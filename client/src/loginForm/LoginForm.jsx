@@ -10,12 +10,15 @@ const Container = styled.div`
   padding: 20px;
 `;
 
-const Text = styled.p`
+const SignUpLink = styled.div`
   font-size: 16px;
   margin-bottom: 20px;
   line-height: 24px;
-  color: rgba(0, 0, 0, 0.5);
-  text-align: justify-left;
+  color: #666666;
+  text-align: center;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  padding-top: 1.125rem;
 `;
 
 const Form = styled.form`
@@ -33,8 +36,9 @@ const Label = styled.label`
   margin-bottom: 5px;
   font-size: 16px;
   line-height: 24px;
-  color: rgba(0, 0, 0, 0.5);
+  color: #666666;
   text-align: justify-left;
+  font-family: 'Poppins', sans-serif;
 `;
 
 const Input = styled.input`
@@ -42,6 +46,7 @@ const Input = styled.input`
   border: 1px solid #dddddd;
   border-radius: 5px;
   max-width: 400px;
+  font-family: 'Poppins', sans-serif;
   &::placeholder {
     color: #d9d9d9;
     font-size: 1rem;
@@ -56,12 +61,32 @@ const Button = styled.button`
   padding: 10px;
   background-color: #ffc107;
   color: #fff;
-  border: 1px solid #ffc107;
+  border: none;
   border-radius: 5px;
   cursor: pointer;
   max-width: 400px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
   &:hover {
-    background-color: #0056b3;
+    background-color: #b38600;
+  }
+`;
+
+const ErrorMessage = styled.p`
+font-family: 'Poppins', sans-serif;
+  font-size: 13px;
+  color: #990000;
+  padding-top: 0.3rem;
+  padding-bottom: 0.3rem;
+`;
+
+const SignLink = styled(Link)`
+  color: #666666;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
   }
 `;
 
@@ -81,7 +106,7 @@ function LoginForm() {
       navigate("/home");
     } catch (error) {
       console.error("Login error:", error);
-      setServerError(error.message);
+      setServerError("Incorrect email or password. Please try again.");
     }
   };
 
@@ -94,9 +119,9 @@ function LoginForm() {
             type="text"
             name="login"
             autoComplete="username"
-            {...register("login", { required: "Username is required" })}
+            {...register("login", { required: "Email is required" })}
           />
-          {errors.username && <p>{errors.username.message}</p>}
+         {errors.login && <ErrorMessage>{errors.login.message}</ErrorMessage>}
         </FormGroup>
 
         <FormGroup>
@@ -107,13 +132,13 @@ function LoginForm() {
             autoComplete="current-password"
             {...register("password", { required: "Password is required" })}
           />
-          {errors.password && <p>{errors.password.message}</p>}
+          {errors.password && <ErrorMessage>{errors.password.message}</ErrorMessage>}
         </FormGroup>
-        {serverError && <p>{serverError}</p>}
+        {serverError && <ErrorMessage>{serverError}</ErrorMessage>}
         <Button type="submit">SIGN IN</Button>
-        <Text>
-          Don't have an account? <Link to="/registration">Sign up</Link>
-        </Text>
+        <SignUpLink>
+          Don&apos;t have an account? <SignLink to="/registration">Sign up</SignLink>
+        </SignUpLink>
       </Form>
     </Container>
   );

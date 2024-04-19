@@ -33,6 +33,10 @@ const DownloadIcon = styled.img`
   width: 30px;
   height: 30px;
   cursor: pointer;
+  &:hover {
+    filter: brightness(0.5);
+    transform: scale(0.9);
+  }
 `;
 
 const ColumnsContainer = styled.div`
