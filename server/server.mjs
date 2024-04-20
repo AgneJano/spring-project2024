@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import passport from "./strategies/auth.mjs";
 import { connectDB } from "./db/postgresConnection.mjs";
 import usersRouter from "./routes/index.mjs";
+import projectsRouter from "./routes/index.mjs";
 import cors from "cors";
 
 dotenv.config();
@@ -25,7 +26,7 @@ const startServer = async () => {
     app.use(express.json()); //must be before the route !!
     app.use(passport.initialize());
 
-    app.use("/api/v1/planpro", usersRouter);
+    app.use("/api/v1/planpro", usersRouter, projectsRouter);
 
     const PORT = process.env.PORT || 1000;
 
