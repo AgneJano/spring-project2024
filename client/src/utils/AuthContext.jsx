@@ -8,13 +8,10 @@ export const AuthProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [token, setToken] = useState(localStorage.getItem("token") || null);
   const [user, setUser] = useState(null);
-
   useEffect(() => {
     const token = localStorage.getItem("token");
-    console.log("Token from localStorage:", token);
     if (token) {
       const user = jwtDecode(token);
-      console.log("User from jwtDecode:", user);
 
       setToken(token);
       setUser(user);
@@ -30,15 +27,13 @@ export const AuthProvider = ({ children }) => {
         password: data.password,
       });
       if (response.data) {
-        console.log(response.data);
         // nurodome, kad response.data turi būti tokenas, kuris yra grąžinamas iš serverio, nes jis yra reikalingas, kad prisijungti prie sistemos
         const token = response.data.token;
-        console.log(token);
         // tai ties ta vieta, mes naudojame user state objektą, kad išsaugoti vartotojo duomenis, kurie yra iš tokeno, kai vartotojas prisijungia
         // o viršuje naudojome useEffect() metodą, kad išsaugoti vartotojo duomenis, kurie yra iš tokeno, tai bus pasiekiamas visada, kai atnaujiname puslapį
         const user = jwtDecode(token);
         // Naudojame localStorage.setItem('token', token), tai todėl, kad kai atnaujiname puslapį, tai mes neprarasime prisijungimo duomenų (token ir user)
-        console.log("User from loginUser:", user);
+
         localStorage.setItem("token", token);
         setToken(token);
         setUser(user);

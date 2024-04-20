@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import styled from "styled-components";
 import logo from "../assets/logo.svg";
 import projects_icon from "../assets/projects_icon.svg";
@@ -61,12 +61,12 @@ const DropdownContent = styled.div`
   display: ${(props) => (props.isOpen ? "block" : "none")};
   position: absolute;
   background-color: white;
-  border: 1px solid #ddd; 
+  border: 1px solid #ddd;
   padding: 8px 0;
   min-width: 120px;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
   z-index: 1;
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
 `;
 
 const DropdownItem = styled.div`
@@ -76,28 +76,29 @@ const DropdownItem = styled.div`
   cursor: pointer;
   width: 100%;
   a {
-    text-decoration: none; 
-    color: black; 
-    font-family: 'Poppins', sans-serif;
+    text-decoration: none;
+    color: black;
+    font-family: "Poppins", sans-serif;
     &:hover {
-      color: #A9A9A9;
+      color: #a9a9a9;
     }
   }
 `;
 
-const LogoutLink = styled(Link)`
+const LogoutLink = styled.p`
   text-decoration: none;
   color: black;
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
 
   &:hover {
-    color: #A9A9A9;
+    color: #a9a9a9;
   }
 `;
 
 function Navbar() {
   const { isAuthenticated, logoutUser } = useContext(AuthContext);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -106,6 +107,7 @@ function Navbar() {
   const handleLogout = () => {
     logoutUser();
     setIsMenuOpen(false);
+    navigate("/");
   };
 
   return (
@@ -140,7 +142,7 @@ function Navbar() {
                     <Link to="/profile">Profile</Link>
                   </DropdownItem>
                   <DropdownItem onClick={handleLogout}>
-                    <LogoutLink to="/logout">Log out</LogoutLink>
+                    <LogoutLink>Log out</LogoutLink>
                   </DropdownItem>
                 </DropdownContent>
               </DropdownMenu>

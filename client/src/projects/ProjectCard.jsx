@@ -1,9 +1,10 @@
 import { styled } from "styled-components";
+import { useContext } from "react";
 import { getStatusSvgUrl } from "../mainFunctions";
 import deleteIcon from "../assets/icons/delete.svg";
 import editIcon from "../assets/icons/edit.svg";
 import axios from "axios";
-
+import { AuthContext } from "../utils/AuthContext";
 const Container = styled.div`
   border: 1px solid #dddddd;
   border-radius: 0.25rem;
@@ -78,31 +79,17 @@ export const ProjectCard = ({
   status,
   tasksLeft,
   tasks,
+  isVisibleDelete,
+  onDeleteModalOpen
 }) => {
   const url = getStatusSvgUrl(status);
 
   const onDeleteClick = async (projectId) => {
-    // const url = "https://api.jsonbin.io/v3/b/661eb81fe41b4d34e4e55765";
-    // try {
-    //   const response = await axios.delete(url, {
-    //     headers: {
-    //       "X-Master-Key":
-    //         "$2a$10$ep7mKSMiDETvfKp/AyhAEez73Ll2iqMLhJoQ3ze8q/En5oV69kXdC",
-    //       id: projectId,
-    //     },
-    //   });
-    //   if (response.status === 200) {
-    //     console.log(`Project with ID ${projectId} deleted successfully`);
-    //     return true;
-    //   } else {
-    //     console.error(`Failed to delete project with ID ${projectId}`);
-    //     return false;
-    //   }
-    // } catch (error) {
-    //   console.error("Error:", error);
-    //   return false;
-    // }
+    onDeleteModalOpen(); // Open modal for this project
+    // Additional logic for deleting the project
   };
+
+  
   const truncateDescription = (description) => {
     if (description.length <= 255) {
       return description;
@@ -112,14 +99,14 @@ export const ProjectCard = ({
     }
   };
   return (
-    <Container>
+    <>
+    <Container  onClick={()=> console.log(name)}>
       <Header>
         <StatusBubble src={url} alt="Project status bubble" />
         <Title>{name}</Title>
       </Header>
       <DescriptionContainer>
         <DescriptionTitle>Description</DescriptionTitle>
-        {/* TO DO: max simboliu su tarpais 255, reiks kazkaip trimint desc jeigu bus ilgenis */}
         <Description>{truncateDescription(description)}</Description>
       </DescriptionContainer>
       <TaskContainer>
@@ -128,16 +115,21 @@ export const ProjectCard = ({
         </TaskInfo>
         <ImageContainer>
           {/* TO DO: funkcionalas */}
-          <StyledIcon src={editIcon} />
-          <StyledIcon
-            src={deleteIcon}
-            onClick={() => {
-              console.log("Icon clicked"); // Add this line for debugging
-              onDeleteClick(id);
-            }}
-          />
+          <StyledIcon src={editIcon}  onClick={(e)=> {e.stopPropagation();console.log('edit')}}/>
+          {true && (
+            <StyledIcon
+              src={deleteIcon}
+              onClick={(e) => {
+                e.stopPropagation();
+
+                console.log("delete");
+                onDeleteClick(id);
+              }}
+            />
+          )}
         </ImageContainer>
       </TaskContainer>
     </Container>
+    </>
   );
 };
