@@ -3,7 +3,6 @@ import { useContext } from "react";
 import { getStatusSvgUrl } from "../mainFunctions";
 import deleteIcon from "../assets/icons/delete.svg";
 import editIcon from "../assets/icons/edit.svg";
-import axios from "axios";
 import { AuthContext } from "../utils/AuthContext";
 import { useNavigate } from "react-router-dom";
 const Container = styled.div`
@@ -86,8 +85,7 @@ export const ProjectCard = ({
   const url = getStatusSvgUrl(status);
   const navigate = useNavigate();
   const onDeleteClick = async (projectId) => {
-    onDeleteModalOpen(); // Open modal for this project
-    // Additional logic for deleting the project
+    onDeleteModalOpen(projectId);
   };
 
   const truncateDescription = (description) => {
@@ -122,7 +120,7 @@ export const ProjectCard = ({
                 console.log("edit");
               }}
             />
-            {true && (
+            {isVisibleDelete && (
               <StyledIcon
                 src={deleteIcon}
                 onClick={(e) => {

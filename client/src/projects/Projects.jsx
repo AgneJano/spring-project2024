@@ -8,6 +8,9 @@ import CreateButton from "../components/CreateButton";
 import Filter from "../components/Filter";
 import { AuthContext } from "../utils/AuthContext";
 import { DeleteModal } from "../components/DeleteModal";
+import axios from "axios";
+import downloadIcon from "../assets/download.svg";
+import { CSVLink } from "react-csv";
 
 const CardsContainer = styled.div`
   display: flex;
@@ -32,11 +35,12 @@ const LoadingContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 200px; /* Or adjust to your preference */
+  height: 200px;
 `;
 
 const ButtonsContainer = styled.div`
     display: flex;
+    align-items: center;
    gap: 0.625rem;
    max-width: 77.5rem;
    margin: 0 auto;
@@ -73,31 +77,59 @@ const PaginationButton = styled.button`
   }
 `;
 
+const DownloadIcon = styled.img`
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  &:hover {
+    filter: brightness(0.5);
+    transform: scale(0.9);
+  }
+`;
+
 export const Projects = () => {
-  const { data, loading } = useFetch(
-    useMemo(() => 'http://localhost:1000/api/v1/planpro/projects', []),
+  const { data, loading, refetch } = useFetch(
+    useMemo(() => "http://localhost:1000/api/v1/planpro/projects", []),
   );
   const { user } = useContext(AuthContext);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10); // Change as needed
-  const [deleteModalIemId, setDeleteModalItemId] = useState(null);
+  const [deleteModalItemId, setDeleteModalItemId] = useState(null);
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentProjects = data?.slice(
-    indexOfFirstItem,
-    indexOfLastItem,
-  );
+  const currentProjects = data?.slice(indexOfFirstItem, indexOfLastItem);
 
   // Change page
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  const deleteProject = async () => {
+    try {
+      console.log(deleteModalItemId);
+      await axios.delete(
+        `http://localhost:1000/api/v1/planpro/projects/${deleteModalItemId}`,
+      );
+      refetch();
+    } catch (error) {
+      console.error("Error deleting project:", error);
+    }
+  };
+
+  const headers = [
+    { label: "Project ID", key: "id" },
+    { label: "Project Name", key: "name" },
+    { label: "Description", key: "description" },
+    { label: "Status", key: "status" },
+  ];
 
   return (
     <>
       <Title>Projects</Title>
       <ButtonsContainer>
-        <CreateButton buttonTitle={"Add project"} />
+        <CreateButton buttonTitle="Add project" />
         <Search />
         <Filter filterElement="projects" />
+        <CSVLink data={data} headers={headers} filename="projects.csv">
+          <DownloadIcon src={downloadIcon} alt="Download" />
+        </CSVLink>
       </ButtonsContainer>
 
       <CardsContainer>
@@ -134,10 +166,11 @@ export const Projects = () => {
         </PaginationContainer>
       )}
 
-      {deleteModalIemId && (
+      {deleteModalItemId && (
         <DeleteModal
-          projectId={deleteModalIemId}
+          projectId={deleteModalItemId}
           onClose={() => setDeleteModalItemId(null)}
+          onDelete={() => deleteProject(deleteModalItemId)}
         />
       )}
     </>

@@ -8,7 +8,6 @@ const projectModel = {
       const paginate = query.paginate === "true";
       const page = parseInt(query.page) || 1;
       const limit = parseInt(query.limit) || 12;
-
       if (status && paginate) {
         // Case 1: When user needs to use both paginate and status together
         const offset = (page - 1) * limit;
@@ -68,6 +67,27 @@ const projectModel = {
       throw error;
     }
   },
+  deleteProject: async (id) => {
+    try {
+      const query = "DELETE FROM projects WHERE id = $1 RETURNING *";
+      const result = await pool.query(query, [id]);
+      return result.rows[0];
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  },
+  getProjectsByStatus: async (status) => {
+    try {
+      const query = "SELECT * FROM projects WHERE status = $1";
+      const result = await pool.query(query, [status]);
+      return result.rows;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  },
+
 };
 
 export default projectModel;

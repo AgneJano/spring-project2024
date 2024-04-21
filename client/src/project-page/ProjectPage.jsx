@@ -22,6 +22,7 @@ const ButtonContainer = styled.div`
 
 const ButtonsContainer = styled.div`
     display: flex;
+    align-items: center;
    gap: 0.625rem;
    max-width: 77.5rem;
    margin: 0 auto;
