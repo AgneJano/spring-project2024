@@ -1,10 +1,14 @@
-import styled from 'styled-components';
-import TaskColumn from '../components/TaskColumn';
-import tasksData from '../data/tasks.json';
-import downloadIcon from '../assets/download.svg';
-import Search from '../components/Search';
-import CreateButton from '../components/CreateButton';
-import { getStatusSvgUrl } from '../mainFunctions';
+import { styled } from "styled-components";
+import { useParams } from "react-router-dom";
+import SyncLoader from "react-spinners/SyncLoader";
+import TaskColumn from "../components/TaskColumn";
+import tasksData from "../data/tasks.json";
+import downloadIcon from "../assets/download.svg";
+import Search from "../components/Search";
+import CreateButton from "../components/CreateButton";
+import { getStatusSvgUrl } from "../mainFunctions";
+import { useMemo } from "react";
+import { useFetch } from "../fetching-data/UseFetch";
 
 const ProjectPageContainer = styled.div`
   max-width: 1180px;
@@ -42,7 +46,7 @@ const DownloadIcon = styled.img`
 const ColumnsContainer = styled.div`
   display: flex;
   justify-content: space-between;
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
 `;
 
 const TaskColumnWrapper = styled.div`
@@ -61,19 +65,19 @@ const StatusBubble = styled.img`
 const Title = styled.p`
   font-weight: 500;
   font-size: 1.25rem;
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
 `;
 
 const DescriptionTitle = styled.p`
   font-weight: 500;
   font-size: 1rem;
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
 `;
 
 const Description = styled.p`
   font-size: 1rem;
   line-height: 1.25rem;
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
 `;
 
 const DescriptionContainer = styled.div`
@@ -90,43 +94,65 @@ const Header = styled.div`
   padding-bottom: 1.875rem;
 `;
 
-function ProjectPage({ status, name, description }) {
-  const tasksToDo = tasksData.filter((task) => task.status === 'to-do');
-  const tasksInProgress = tasksData.filter((task) => task.status === 'in-progress');
-  const tasksDone = tasksData.filter((task) => task.status === 'done');
+const LoadingContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+`;
 
-  const url = getStatusSvgUrl(status);
+function ProjectPage() {
+  const { id } = useParams();
+
+  const { data, loading } = useFetch(
+    useMemo(() => `http://localhost:1000/api/v1/planpro/projects/${id}`, []),
+  );
+  const tasksToDo = tasksData.filter((task) => task.status === "to-do");
+  const tasksInProgress = tasksData.filter(
+    (task) => task.status === "in-progress",
+  );
+  const tasksDone = tasksData.filter((task) => task.status === "done");
+  const url = getStatusSvgUrl(data?.status);
 
   return (
-    <ProjectPageContainer>
-      <Header>
-        <StatusBubble src={url} alt="Project status bubble" />
-        <Title>{name}</Title>
-      </Header>
-      <DescriptionContainer>
-        <DescriptionTitle>Description</DescriptionTitle>
-        {/* TO DO: max simboliu su tarpais 255, reiks kazkaip trimint desc jeigu bus ilgenis */}
-        <Description>{description}</Description>
-      </DescriptionContainer>
-      <ButtonContainer>
-        <ButtonsContainer>
-          <CreateButton buttonTitle={'Add task'} />
-          <Search />
-          <DownloadIcon src={downloadIcon} alt="Download" />
-        </ButtonsContainer>
-      </ButtonContainer>
-      <ColumnsContainer>
-        <TaskColumnWrapper>
-          <TaskColumn title="To Do" tasks={tasksToDo} />
-        </TaskColumnWrapper>
-        <TaskColumnWrapper>
-          <TaskColumn title="In progress" tasks={tasksInProgress} />
-        </TaskColumnWrapper>
-        <TaskColumnWrapper>
-          <TaskColumn title="Done" tasks={tasksDone} />
-        </TaskColumnWrapper>
-      </ColumnsContainer>
-    </ProjectPageContainer>
+    <>
+      {loading ? (
+        <LoadingContainer>
+          <SyncLoader color={"#FFC107"} loading={loading} size={20} />
+        </LoadingContainer>
+      ) : (
+        <ProjectPageContainer>
+          <Header>
+            <StatusBubble src={url} alt="Project status bubble" />
+            <Title>{data?.name}</Title>
+          </Header>
+          {data?.description && (
+            <DescriptionContainer>
+              <DescriptionTitle>Description</DescriptionTitle>
+              <Description>{data?.description}</Description>
+            </DescriptionContainer>
+          )}
+          <ButtonContainer>
+            <ButtonsContainer>
+              <CreateButton buttonTitle={"Add task"} />
+              <Search />
+              <DownloadIcon src={downloadIcon} alt="Download" />
+            </ButtonsContainer>
+          </ButtonContainer>
+          <ColumnsContainer>
+            <TaskColumnWrapper>
+              <TaskColumn title="To Do" tasks={tasksToDo} />
+            </TaskColumnWrapper>
+            <TaskColumnWrapper>
+              <TaskColumn title="In progress" tasks={tasksInProgress} />
+            </TaskColumnWrapper>
+            <TaskColumnWrapper>
+              <TaskColumn title="Done" tasks={tasksDone} />
+            </TaskColumnWrapper>
+          </ColumnsContainer>
+        </ProjectPageContainer>
+      )}
+    </>
   );
 }
 

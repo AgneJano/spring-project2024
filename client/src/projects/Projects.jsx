@@ -1,3 +1,4 @@
+import { useState, useContext, useMemo } from "react";
 import { ProjectCard } from "./ProjectCard";
 import { styled } from "styled-components";
 import { useFetch } from "../fetching-data/UseFetch";
@@ -5,6 +6,8 @@ import SyncLoader from "react-spinners/SyncLoader";
 import Search from "../components/Search";
 import CreateButton from "../components/CreateButton";
 import Filter from "../components/Filter";
+import { AuthContext } from "../utils/AuthContext";
+import { DeleteModal } from "../components/DeleteModal";
 
 const CardsContainer = styled.div`
   display: flex;
@@ -44,10 +47,49 @@ const ButtonsContainer = styled.div`
     }
 `;
 
+const PaginationContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+  gap: 1rem;
+`;
+
+const PaginationButton = styled.button`
+  width: 150px;
+  height: 50px;
+  padding: 10px;
+  background-color: #ffc107;
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 30px;
+
+  &:hover {
+    background-color: #b38600;
+  }
+`;
+
 export const Projects = () => {
   const { data, loading } = useFetch(
-    "https://api.jsonbin.io/v3/b/661eb81fe41b4d34e4e55765",
+    useMemo(() => 'http://localhost:1000/api/v1/planpro/projects', []),
   );
+  const { user } = useContext(AuthContext);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10); // Change as needed
+  const [deleteModalIemId, setDeleteModalItemId] = useState(null);
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentProjects = data?.slice(
+    indexOfFirstItem,
+    indexOfLastItem,
+  );
+
+  // Change page
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
     <>
@@ -64,11 +106,40 @@ export const Projects = () => {
             <SyncLoader color={"#FFC107"} loading={loading} size={20} />
           </LoadingContainer>
         ) : (
-          data.record.projects.map((project, i) => (
-            <ProjectCard key={`projectCard${i}`} {...project} />
+          currentProjects?.map((project, i) => (
+            <ProjectCard
+              key={`projectCard${i}`}
+              {...project}
+              isVisibleDelete={user.role === "admin" ? true : false}
+              onDeleteModalOpen={() => setDeleteModalItemId(project.id)}
+            />
           ))
         )}
       </CardsContainer>
+
+      {data.length > 12 && (
+        <PaginationContainer>
+          <PaginationButton
+            onClick={() => paginate(currentPage - 1)}
+            disabled={currentPage === 1}
+          >
+            Previous
+          </PaginationButton>
+          <PaginationButton
+            onClick={() => paginate(currentPage + 1)}
+            disabled={indexOfLastItem >= data?.record?.projects.length}
+          >
+            Next
+          </PaginationButton>
+        </PaginationContainer>
+      )}
+
+      {deleteModalIemId && (
+        <DeleteModal
+          projectId={deleteModalIemId}
+          onClose={() => setDeleteModalItemId(null)}
+        />
+      )}
     </>
   );
 };

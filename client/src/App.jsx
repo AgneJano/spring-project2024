@@ -25,7 +25,8 @@ function App() {
           <>
             <Route path="/home" element={<Dashboard />} />
             <Route path="/projects" element={<Projects />} />
-            <Route path="/project" element={<ProjectPage status='in-progress' name='Projektas' description='Projekto aprasymas'/>} />
+            <Route path="/projects/:id" element={<ProjectPage />} />
+            {/* <Route path="/project" element={<ProjectPage status='in-progress' name='Projektas' description='Projekto aprasymas'/>} /> */}
           </>
         ) : (
           <>
