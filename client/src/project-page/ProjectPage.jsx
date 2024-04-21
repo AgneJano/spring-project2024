@@ -1,11 +1,14 @@
 import { styled } from "styled-components";
 import { useParams } from "react-router-dom";
+import SyncLoader from "react-spinners/SyncLoader";
 import TaskColumn from "../components/TaskColumn";
 import tasksData from "../data/tasks.json";
 import downloadIcon from "../assets/download.svg";
 import Search from "../components/Search";
 import CreateButton from "../components/CreateButton";
 import { getStatusSvgUrl } from "../mainFunctions";
+import { useMemo } from "react";
+import { useFetch } from "../fetching-data/UseFetch";
 
 const ProjectPageContainer = styled.div`
   max-width: 1180px;
@@ -91,53 +94,64 @@ const Header = styled.div`
   padding-bottom: 1.875rem;
 `;
 
-function ProjectPage({ name, description, status }) {
+const LoadingContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+`;
+
+function ProjectPage() {
   const { id } = useParams();
 
+  const { data, loading } = useFetch(
+    useMemo(() => `http://localhost:1000/api/v1/planpro/projects/${id}`, []),
+  );
   const tasksToDo = tasksData.filter((task) => task.status === "to-do");
   const tasksInProgress = tasksData.filter(
     (task) => task.status === "in-progress",
   );
   const tasksDone = tasksData.filter((task) => task.status === "done");
-  const url = getStatusSvgUrl(status);
+  const url = getStatusSvgUrl(data?.status);
 
   return (
     <>
-      <ProjectPageContainer>
-        <Header>
-          <StatusBubble src={url} alt="Project status bubble" />
-          <Title>{name}</Title>
-        </Header>
-        <DescriptionContainer>
-          <DescriptionTitle>Description</DescriptionTitle>
-          <Description>{description}</Description>
-        </DescriptionContainer>
-        <ButtonContainer>
-          <ButtonsContainer>
-            <CreateButton buttonTitle={"Add task"} />
-            <Search />
-            <DownloadIcon src={downloadIcon} alt="Download" />
-          </ButtonsContainer>
-        </ButtonContainer>
-        <ColumnsContainer>
-          <TaskColumnWrapper>
-            <TaskColumn title="To Do" tasks={tasksToDo} />
-          </TaskColumnWrapper>
-          <TaskColumnWrapper>
-            <TaskColumn title="In progress" tasks={tasksInProgress} />
-          </TaskColumnWrapper>
-          <TaskColumnWrapper>
-            <TaskColumn title="Done" tasks={tasksDone} />
-          </TaskColumnWrapper>
-        </ColumnsContainer>
-      </ProjectPageContainer>
-
-      {/* {deleteModalIemId && (
-        <DeleteModal
-          projectId={deleteModalIemId}
-          onClose={() => setDeleteModalId(null)}
-        />
-      )} */}
+      {loading ? (
+        <LoadingContainer>
+          <SyncLoader color={"#FFC107"} loading={loading} size={20} />
+        </LoadingContainer>
+      ) : (
+        <ProjectPageContainer>
+          <Header>
+            <StatusBubble src={url} alt="Project status bubble" />
+            <Title>{data?.name}</Title>
+          </Header>
+          {data?.description && (
+            <DescriptionContainer>
+              <DescriptionTitle>Description</DescriptionTitle>
+              <Description>{data?.description}</Description>
+            </DescriptionContainer>
+          )}
+          <ButtonContainer>
+            <ButtonsContainer>
+              <CreateButton buttonTitle={"Add task"} />
+              <Search />
+              <DownloadIcon src={downloadIcon} alt="Download" />
+            </ButtonsContainer>
+          </ButtonContainer>
+          <ColumnsContainer>
+            <TaskColumnWrapper>
+              <TaskColumn title="To Do" tasks={tasksToDo} />
+            </TaskColumnWrapper>
+            <TaskColumnWrapper>
+              <TaskColumn title="In progress" tasks={tasksInProgress} />
+            </TaskColumnWrapper>
+            <TaskColumnWrapper>
+              <TaskColumn title="Done" tasks={tasksDone} />
+            </TaskColumnWrapper>
+          </ColumnsContainer>
+        </ProjectPageContainer>
+      )}
     </>
   );
 }

@@ -75,7 +75,7 @@ const PaginationButton = styled.button`
 
 export const Projects = () => {
   const { data, loading } = useFetch(
-    useMemo(() => "https://api.jsonbin.io/v3/b/661eb81fe41b4d34e4e55765", []),
+    useMemo(() => 'http://localhost:1000/api/v1/planpro/projects', []),
   );
   const { user } = useContext(AuthContext);
   const [currentPage, setCurrentPage] = useState(1);
@@ -83,7 +83,7 @@ export const Projects = () => {
   const [deleteModalIemId, setDeleteModalItemId] = useState(null);
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentProjects = data?.record?.projects.slice(
+  const currentProjects = data?.slice(
     indexOfFirstItem,
     indexOfLastItem,
   );
@@ -106,7 +106,7 @@ export const Projects = () => {
             <SyncLoader color={"#FFC107"} loading={loading} size={20} />
           </LoadingContainer>
         ) : (
-          currentProjects.map((project, i) => (
+          currentProjects?.map((project, i) => (
             <ProjectCard
               key={`projectCard${i}`}
               {...project}

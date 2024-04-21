@@ -5,6 +5,7 @@ import deleteIcon from "../assets/icons/delete.svg";
 import editIcon from "../assets/icons/edit.svg";
 import axios from "axios";
 import { AuthContext } from "../utils/AuthContext";
+import { useNavigate } from "react-router-dom";
 const Container = styled.div`
   border: 1px solid #dddddd;
   border-radius: 0.25rem;
@@ -80,16 +81,15 @@ export const ProjectCard = ({
   tasksLeft,
   tasks,
   isVisibleDelete,
-  onDeleteModalOpen
+  onDeleteModalOpen,
 }) => {
   const url = getStatusSvgUrl(status);
-
+  const navigate = useNavigate();
   const onDeleteClick = async (projectId) => {
     onDeleteModalOpen(); // Open modal for this project
     // Additional logic for deleting the project
   };
 
-  
   const truncateDescription = (description) => {
     if (description.length <= 255) {
       return description;
@@ -100,36 +100,42 @@ export const ProjectCard = ({
   };
   return (
     <>
-    <Container  onClick={()=> console.log(name)}>
-      <Header>
-        <StatusBubble src={url} alt="Project status bubble" />
-        <Title>{name}</Title>
-      </Header>
-      <DescriptionContainer>
-        <DescriptionTitle>Description</DescriptionTitle>
-        <Description>{truncateDescription(description)}</Description>
-      </DescriptionContainer>
-      <TaskContainer>
-        <TaskInfo>
-          Tasks left: {tasksLeft}/{tasks}
-        </TaskInfo>
-        <ImageContainer>
-          {/* TO DO: funkcionalas */}
-          <StyledIcon src={editIcon}  onClick={(e)=> {e.stopPropagation();console.log('edit')}}/>
-          {true && (
+      <Container onClick={() => navigate(`/projects/${id}`)}>
+        <Header>
+          <StatusBubble src={url} alt="Project status bubble" />
+          <Title>{name}</Title>
+        </Header>
+        <DescriptionContainer>
+          <DescriptionTitle>Description</DescriptionTitle>
+          <Description>{truncateDescription(description)}</Description>
+        </DescriptionContainer>
+        <TaskContainer>
+          <TaskInfo>
+            Tasks left: {tasksLeft}/{tasks}
+          </TaskInfo>
+          <ImageContainer>
+            {/* TO DO: funkcionalas */}
             <StyledIcon
-              src={deleteIcon}
+              src={editIcon}
               onClick={(e) => {
                 e.stopPropagation();
-
-                console.log("delete");
-                onDeleteClick(id);
+                console.log("edit");
               }}
             />
-          )}
-        </ImageContainer>
-      </TaskContainer>
-    </Container>
+            {true && (
+              <StyledIcon
+                src={deleteIcon}
+                onClick={(e) => {
+                  e.stopPropagation();
+
+                  console.log("delete");
+                  onDeleteClick(id);
+                }}
+              />
+            )}
+          </ImageContainer>
+        </TaskContainer>
+      </Container>
     </>
   );
 };
