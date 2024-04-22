@@ -54,11 +54,11 @@ const projectModel = {
   },
   createProject: async (projectData) => {
     try {
-      const { name, description, status } = projectData;
+      const { name, description } = projectData;
 
       const result = await pool.query(
-        "INSERT INTO projects (name, description, status) VALUES ($1, $2, $3) RETURNING *",
-        [name, description, status]
+        "INSERT INTO projects (name, description, status) VALUES ($1, $2, 'in-progress') RETURNING *",
+        [name, description]
       );
 
       return result.rows[0];
@@ -87,7 +87,6 @@ const projectModel = {
       throw error;
     }
   },
-
 };
 
 export default projectModel;

@@ -11,6 +11,7 @@ import { DeleteModal } from "../components/DeleteModal";
 import axios from "axios";
 import downloadIcon from "../assets/download.svg";
 import { CSVLink } from "react-csv";
+import { useNavigate } from "react-router-dom";
 
 const CardsContainer = styled.div`
   display: flex;
@@ -39,16 +40,16 @@ const LoadingContainer = styled.div`
 `;
 
 const ButtonsContainer = styled.div`
-    display: flex;
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  max-width: 77.5rem;
+  margin: 0 auto;
+  @media (max-width: 48em) {
+    flex-direction: column;
     align-items: center;
-   gap: 0.625rem;
-   max-width: 77.5rem;
-   margin: 0 auto;
-   @media (max-width: 48em){
-        flex-direction: column;
-        align-items: center
-        padding: 0 1rem;
-    }
+    padding: 0 1rem;
+  }
 `;
 
 const PaginationContainer = styled.div`
@@ -89,18 +90,27 @@ const DownloadIcon = styled.img`
 
 export const Projects = () => {
   const { data, loading, refetch } = useFetch(
-    useMemo(() => "http://localhost:1000/api/v1/planpro/projects", []),
+    useMemo(
+      () => "http://localhost:1000/api/v1/planpro/projects?page=1&limit=12",
+      [],
+    ),
   );
   const { user } = useContext(AuthContext);
+  const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10); // Change as needed
+  const [itemsPerPage] = useState(12);
   const [deleteModalItemId, setDeleteModalItemId] = useState(null);
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentProjects = data?.slice(indexOfFirstItem, indexOfLastItem);
 
-  // Change page
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  const paginate = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    refetch(
+      `http://localhost:1000/api/v1/planpro/projects?page=${pageNumber}&limit=${itemsPerPage}`,
+    );
+  };
+
   const deleteProject = async () => {
     try {
       console.log(deleteModalItemId);
@@ -124,7 +134,10 @@ export const Projects = () => {
     <>
       <Title>Projects</Title>
       <ButtonsContainer>
-        <CreateButton buttonTitle="Add project" />
+        <CreateButton
+          buttonTitle="Add project"
+          onClick={() => navigate("/create-project")}
+        />
         <Search />
         <Filter filterElement="projects" />
         <CSVLink data={data} headers={headers} filename="projects.csv">
@@ -151,18 +164,22 @@ export const Projects = () => {
 
       {data.length > 12 && (
         <PaginationContainer>
-          <PaginationButton
-            onClick={() => paginate(currentPage - 1)}
-            disabled={currentPage === 1}
-          >
-            Previous
-          </PaginationButton>
-          <PaginationButton
-            onClick={() => paginate(currentPage + 1)}
-            disabled={indexOfLastItem >= data?.record?.projects.length}
-          >
-            Next
-          </PaginationButton>
+          {currentPage !== 1 && (
+            <PaginationButton
+              onClick={() => paginate(currentPage - 1)}
+              disabled={currentPage === 1}
+            >
+              Previous
+            </PaginationButton>
+          )}
+          {indexOfLastItem < data?.length && (
+            <PaginationButton
+              onClick={() => paginate(currentPage + 1)}
+              disabled={indexOfLastItem >= data?.record?.projects.length}
+            >
+              Next
+            </PaginationButton>
+          )}
         </PaginationContainer>
       )}
 

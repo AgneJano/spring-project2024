@@ -16,7 +16,7 @@ const SignUpLink = styled.div`
   line-height: 24px;
   color: #666666;
   text-align: center;
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
   font-weight: 500;
   padding-top: 1.125rem;
 `;
@@ -38,7 +38,7 @@ const Label = styled.label`
   line-height: 24px;
   color: #666666;
   text-align: justify-left;
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
 `;
 
 const Input = styled.input`
@@ -46,7 +46,7 @@ const Input = styled.input`
   border: 1px solid #dddddd;
   border-radius: 5px;
   max-width: 400px;
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
   &::placeholder {
     color: #d9d9d9;
     font-size: 1rem;
@@ -67,14 +67,16 @@ const Button = styled.button`
   max-width: 400px;
   font-weight: 600;
   font-size: 0.9rem;
-  transition: background-color 0.3s ease, border-color 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease;
   &:hover {
     background-color: #b38600;
   }
 `;
 
 const ErrorMessage = styled.p`
-font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
   font-size: 13px;
   color: #990000;
   padding-top: 0.3rem;
@@ -103,7 +105,7 @@ function LoginForm() {
   const onSubmit = async (data) => {
     try {
       await loginUser(data);
-      navigate("/home");
+      navigate("/");
     } catch (error) {
       console.error("Login error:", error);
       setServerError("Incorrect email or password. Please try again.");
@@ -121,7 +123,7 @@ function LoginForm() {
             autoComplete="username"
             {...register("login", { required: "Email is required" })}
           />
-         {errors.login && <ErrorMessage>{errors.login.message}</ErrorMessage>}
+          {errors.login && <ErrorMessage>{errors.login.message}</ErrorMessage>}
         </FormGroup>
 
         <FormGroup>
@@ -132,12 +134,15 @@ function LoginForm() {
             autoComplete="current-password"
             {...register("password", { required: "Password is required" })}
           />
-          {errors.password && <ErrorMessage>{errors.password.message}</ErrorMessage>}
+          {errors.password && (
+            <ErrorMessage>{errors.password.message}</ErrorMessage>
+          )}
         </FormGroup>
         {serverError && <ErrorMessage>{serverError}</ErrorMessage>}
         <Button type="submit">SIGN IN</Button>
         <SignUpLink>
-          Don&apos;t have an account? <SignLink to="/registration">Sign up</SignLink>
+          Don&apos;t have an account?{" "}
+          <SignLink to="/registration">Sign up</SignLink>
         </SignUpLink>
       </Form>
     </Container>

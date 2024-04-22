@@ -114,15 +114,9 @@ function Navbar() {
     <NavbarContainer>
       <MainContainer>
         <LogoContainer>
-          {isAuthenticated ? (
-            <Link to="/home">
-              <Logo src={logo} alt="Logo" />
-            </Link>
-          ) : (
-            <Link to="/">
-              <Logo src={logo} alt="Logo" />
-            </Link>
-          )}
+          <Link to="/">
+            <Logo src={logo} alt="Logo" />
+          </Link>
         </LogoContainer>
         <IconsContainer>
           {isAuthenticated && (
