@@ -70,7 +70,7 @@ const CancelButton = styled(Button)`
 
 export const DeleteModal = ({ projectId, onClose, onDelete }) => {
   const handleConfirmClick = () => {
-    // onDelete(projectId);
+    onDelete(projectId);
     onClose();
   };
 

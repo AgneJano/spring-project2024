@@ -13,7 +13,6 @@ const RegistrationContainer = styled.div`
   align-items: center;
   width: 100%;
   max-width: 400px; 
-  font-family: "Poppins", sans-serif;
   line-height: 36px;
   font-size: 20px; 
   color: #666666;

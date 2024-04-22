@@ -35,6 +35,31 @@ const projectController = {
         .json({ message: "An error occured while creating the project" });
     }
   },
+  deleteProject: async (req, res) => {
+    try {
+      const projectId = req.params.id;
+      const deletedProject = await projectModel.deleteProject(projectId);
+      if (!deletedProject) {
+        return res.status(404).json({ message: "Project not found" });
+      }
+      res
+        .status(200)
+        .json({ message: "Project deleted successfully", deletedProject });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  },
+  getProjectsByStatus: async (req, res) => {
+    try {
+      const { status } = req.query;
+      const projects = await projectModel.getProjectsByStatus(status);
+      res.status(200).json(projects);
+    } catch (error) {
+      console.error("Error retrieving projects by status:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  },
 };
 
 export default projectController;

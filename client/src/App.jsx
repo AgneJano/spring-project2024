@@ -8,6 +8,7 @@ import { Dashboard } from "./dashboard/Dasboard";
 import RegistrationPage from "./registration-page/RegistrationPage";
 import { AuthContext } from "./utils/AuthContext";
 import { Projects } from "./projects/Projects";
+import CreateProjectForm from "./create-project/CreateProjectForm";
 
 function App() {
   const { isAuthenticated } = useContext(AuthContext);
@@ -23,10 +24,10 @@ function App() {
       <Routes>
         {isAuthenticated ? (
           <>
-            <Route path="/home" element={<Dashboard />} />
+            <Route path="/" element={<Dashboard />} />
             <Route path="/projects" element={<Projects />} />
             <Route path="/projects/:id" element={<ProjectPage />} />
-            {/* <Route path="/project" element={<ProjectPage status='in-progress' name='Projektas' description='Projekto aprasymas'/>} /> */}
+            <Route path="/create-project" element={<CreateProjectForm />} />
           </>
         ) : (
           <>
