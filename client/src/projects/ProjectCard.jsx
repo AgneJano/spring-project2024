@@ -32,6 +32,7 @@ const Header = styled.div`
 const Title = styled.p`
   font-weight: 500;
   font-size: 1.25rem;
+  word-break: break-word;
 `;
 
 const DescriptionTitle = styled.p`
@@ -42,6 +43,7 @@ const DescriptionTitle = styled.p`
 const Description = styled.p`
   font-size: 0.9rem;
   line-height: 1.25rem;
+  word-break: break-word;
 `;
 
 const DescriptionContainer = styled.div`
