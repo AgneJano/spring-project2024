@@ -41,7 +41,6 @@ const projectModel = {
       throw error;
     }
   },
-
   getProjectsById: async (id) => {
     try {
       const query = "SELECT * FROM projects WHERE id = $1";
@@ -81,6 +80,31 @@ const projectModel = {
     try {
       const query = "SELECT * FROM projects WHERE status = $1";
       const result = await pool.query(query, [status]);
+      return result.rows;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  },
+  createTaskForProjectId: async (taskData) => {
+    try {
+      const {project_id, name, description, status = 'to-do', priority = 'medium' } = taskData;
+  
+      const result = await pool.query(
+        "INSERT INTO tasks (project_id, name, description, status, priority) VALUES ($1, $2, $3, $4, $5) RETURNING *",
+        [project_id, name, description, status, priority]
+      );
+  
+      return result.rows[0];
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  },
+  getTasksByProjectsId:async (id) => {
+    try {
+      const query = "SELECT * FROM tasks WHERE project_id = $1";
+      const result = await pool.query(query, [id]);
       return result.rows;
     } catch (error) {
       console.error(error);

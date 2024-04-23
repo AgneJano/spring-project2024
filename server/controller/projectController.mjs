@@ -60,6 +60,39 @@ const projectController = {
       res.status(500).json({ message: "Internal server error" });
     }
   },
+  createTaskForProjectId: async (req, res) => {
+    try {
+      const projectId = req.params.id; // Assuming project ID is passed in the URL parameters
+      const project = await projectModel.getProjectsById(projectId);
+
+      if (!project) {
+        return res.status(404).json({ message: "Project not found" });
+      }
+
+      const taskData = { ...req.body, project_id: projectId };
+      const task = await projectModel.createTaskForProjectId(taskData);
+
+      res.status(201).json(task);
+    } catch (error) {
+      console.error(error);
+      res
+        .status(500)
+        .json({ message: "An error occurred while creating the task" });
+    }
+  },
+  getTasksByProjectsId: async (req, res) => {
+    try {
+      const projectId = req.params.id;
+      const project = await projectModel.getTasksByProjectsId(projectId);
+      if (!project) {
+        return res.status(404).json({ message: "Project not found" });
+      }
+      res.status(200).json(project);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  },
 };
 
 export default projectController;

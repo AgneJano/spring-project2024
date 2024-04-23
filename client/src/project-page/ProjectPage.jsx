@@ -9,6 +9,7 @@ import CreateButton from "../components/CreateButton";
 import { getStatusSvgUrl } from "../mainFunctions";
 import { useMemo } from "react";
 import { useFetch } from "../fetching-data/UseFetch";
+import { useNavigate } from "react-router-dom";
 
 const ProjectPageContainer = styled.div`
   max-width: 1180px;
@@ -108,6 +109,8 @@ function ProjectPage() {
   const { data, loading } = useFetch(
     useMemo(() => `http://localhost:1000/api/v1/planpro/projects/${id}`, []),
   );
+
+  const navigate = useNavigate();
   const tasksToDo = tasksData.filter((task) => task.status === "to-do");
   const tasksInProgress = tasksData.filter(
     (task) => task.status === "in-progress",
@@ -135,7 +138,8 @@ function ProjectPage() {
           )}
           <ButtonContainer>
             <ButtonsContainer>
-              <CreateButton buttonTitle={"Add task"} />
+              <CreateButton buttonTitle="Add task"
+                onClick={() => navigate(`/projects/${id}/create-task`)} />
               <Search />
               <DownloadIcon src={downloadIcon} alt="Download" />
             </ButtonsContainer>

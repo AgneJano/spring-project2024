@@ -1,6 +1,6 @@
 import { checkSchema } from "express-validator";
 
-export const projectValidationSchema = checkSchema({
+export const taskValidationSchema = checkSchema({
   name: {
     isLength: {
       options: { min: 3, max: 50 },
