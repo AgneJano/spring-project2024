@@ -45,7 +45,11 @@ const userModel = {
     }
 
     const user = result.rows[0];
+
+
+
     return user;
+
   }
 };
 

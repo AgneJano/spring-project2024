@@ -71,7 +71,7 @@ const userController = {
           .json({ message: "An error occurred while logging in." });
       }
     }
-  },
+  }
 };
 
 export default userController;
