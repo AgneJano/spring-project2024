@@ -27,7 +27,7 @@ router.post(
   );
 
   router.post('/login', validate(loginValidationSchema) , passport.authenticate('local', {session: false}), isUser, (req, res) => {
-    const token = jwt.sign({ id: req.user.id, role: req.user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ id: req.user.id, name: req.user.name, role: req.user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
     res.status(200).json({ message: 'Logged', token })
 } , userController.login);
 

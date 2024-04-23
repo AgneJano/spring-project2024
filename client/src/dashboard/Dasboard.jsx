@@ -20,13 +20,14 @@ const UserInfo = styled.p`
 
 export const Dashboard = () => {
   const { user } = useContext(AuthContext);
+  console.log (user)
 
   return (
     <DashboardContainer>
       <WelcomeMessage>Welcome to the Dashboard!</WelcomeMessage>
       {user && (
         <UserInfo>
-          Hello, ADD NAME ! You are logged in as {user.role}.
+          Hello, {user.name} ! You are logged in as {user.role}.
         </UserInfo>
       )}
       <p>Here you can manage your projects, tasks, and more.</p>
