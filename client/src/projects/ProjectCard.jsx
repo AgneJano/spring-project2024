@@ -33,17 +33,23 @@ const Title = styled.p`
   font-weight: 500;
   font-size: 1.25rem;
   word-break: break-word;
+  user-select: none;
+  cursor: pointer;
 `;
 
 const DescriptionTitle = styled.p`
   font-weight: 500;
   font-size: 1rem;
+  user-select: none;
+  cursor: pointer;
 `;
 
 const Description = styled.p`
   font-size: 0.9rem;
   line-height: 1.25rem;
   word-break: break-word;
+  user-select: none;
+  cursor: pointer;
 `;
 
 const DescriptionContainer = styled.div`
@@ -57,6 +63,8 @@ const DescriptionContainer = styled.div`
 const TaskInfo = styled.p`
   font-size: 1rem;
   color: #c7c6c6;
+  user-select: none;
+  cursor: pointer;
 `;
 
 const TaskContainer = styled.p`
