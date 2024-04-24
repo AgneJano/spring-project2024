@@ -94,6 +94,7 @@ const SubmitButton = styled.button`
 
 const CreateProjectForm = () => {
   const navigate = useNavigate();
+  const [errors, setErrors] = useState(null);
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -107,6 +108,9 @@ const CreateProjectForm = () => {
   };
 
   const handleSubmit = async (e) => {
+    if (errors !== null) {
+      return;
+    }
     e.preventDefault();
     try {
       console.log(formData);
@@ -117,6 +121,7 @@ const CreateProjectForm = () => {
 
       navigate("/projects");
     } catch (error) {
+      setErrors(error);
       console.error("Error creating project:", error);
     }
   };
@@ -133,6 +138,9 @@ const CreateProjectForm = () => {
             name="name"
             value={formData.name}
             onChange={handleChange}
+            minLength={2}
+            maxLength={50}
+            required
           />
         </FormField>
         <FormField>
@@ -142,8 +150,12 @@ const CreateProjectForm = () => {
             name="description"
             value={formData.description}
             onChange={handleChange}
+            minLength={2}
+            maxLength={10000}
+            required
           />
         </FormField>
+        <p>{errors}</p>
         <SubmitButton type="submit">Submit</SubmitButton>
       </StyledForm>
     </RegistrationContainer>
