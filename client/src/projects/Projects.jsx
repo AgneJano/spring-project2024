@@ -94,7 +94,7 @@ export const Projects = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(12);
   const [deleteModalItemId, setDeleteModalItemId] = useState(null);
-  const [selectedStatus, setSelectedStatus] = useState(""); // State to store selected status
+  const [selectedStatus, setSelectedStatus] = useState("");
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
 
@@ -102,7 +102,7 @@ export const Projects = () => {
     useMemo(
       () =>
         `http://localhost:1000/api/v1/planpro/projects${selectedStatus !== "" ? "?status=" + selectedStatus : ""}`,
-      [currentPage, itemsPerPage, selectedStatus],
+      [selectedStatus],
     ),
   );
   const paginate = (pageNumber) => {
@@ -116,7 +116,6 @@ export const Projects = () => {
 
   const deleteProject = async () => {
     try {
-      console.log(deleteModalItemId);
       await axios.delete(
         `http://localhost:1000/api/v1/planpro/projects/${deleteModalItemId}`,
       );

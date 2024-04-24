@@ -3,7 +3,7 @@ import { checkSchema, param } from "express-validator";
 export const projectValidationSchema = checkSchema({
   name: {
     isLength: {
-      options: { min: 6, max: 50 },
+      options: { min: 2, max: 50 },
       errorMessage: "Name must be between 6 and 50 characters",
     },
     notEmpty: {
@@ -15,7 +15,7 @@ export const projectValidationSchema = checkSchema({
   },
   description: {
     isLength: {
-      options: { min: 10, max: 10000 },
+      options: { min: 2, max: 10000 },
       errorMessage: "Description must be between 10 and 10000 characters",
     },
     notEmpty: {
