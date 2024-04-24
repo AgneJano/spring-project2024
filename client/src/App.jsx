@@ -10,6 +10,7 @@ import { AuthContext } from "./utils/AuthContext";
 import { Projects } from "./projects/Projects";
 import CreateProjectForm from "./create-project/CreateProjectForm";
 import CreateTaskForm from "./create-tasks/CreateTaskForm";
+import TaskPage from "./task-page/TaskPage";
 
 function App() {
   const { isAuthenticated } = useContext(AuthContext);
@@ -30,6 +31,7 @@ function App() {
             <Route path="/projects/:id" element={<ProjectPage />} />
             <Route path="/create-project" element={<CreateProjectForm />} />
             <Route path="/projects/:id/create-task" element={<CreateTaskForm />} />
+            <Route path="/tasks/:id" element={<TaskPage />} />
           </>
         ) : (
           <>
