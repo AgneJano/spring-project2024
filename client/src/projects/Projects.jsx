@@ -1,4 +1,4 @@
-import { useState, useContext, useMemo } from "react";
+import { useState, useContext, useMemo, useEffect } from "react";
 import { ProjectCard } from "./ProjectCard";
 import { styled } from "styled-components";
 import { useFetch } from "../fetching-data/UseFetch";
@@ -108,9 +108,15 @@ export const Projects = () => {
   const paginate = (pageNumber) => {
     setCurrentPage(pageNumber);
     refetch(
-      `http://localhost:1000/api/v1/planpro/projects?page=${pageNumber}&limit=${itemsPerPage}`,
+      `http://localhost:1000/api/v1/planpro/projects?page=${pageNumber}&limit=${itemsPerPage}${selectedStatus !== "" ? "&status=" + selectedStatus : ""}`,
     );
   };
+
+  useEffect(() => {
+    if (data.length < 12) {
+      setCurrentPage(1);
+    }
+  }, [data]);
 
   const currentProjects = data?.slice(indexOfFirstItem, indexOfLastItem);
 
@@ -133,7 +139,7 @@ export const Projects = () => {
     { label: "Description", key: "description" },
     { label: "Status", key: "status" },
   ];
-
+  console.log(data);
   return (
     <>
       <Title>Projects</Title>
