@@ -89,27 +89,30 @@ const DownloadIcon = styled.img`
 `;
 
 export const Projects = () => {
-  const { data, loading, refetch } = useFetch(
-    useMemo(
-      () => "http://localhost:1000/api/v1/planpro/projects?page=1&limit=12",
-      [],
-    ),
-  );
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(12);
   const [deleteModalItemId, setDeleteModalItemId] = useState(null);
+  const [selectedStatus, setSelectedStatus] = useState(""); // State to store selected status
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentProjects = data?.slice(indexOfFirstItem, indexOfLastItem);
 
+  const { data, loading, refetch } = useFetch(
+    useMemo(
+      () =>
+        `http://localhost:1000/api/v1/planpro/projects${selectedStatus !== "" ? "?status=" + selectedStatus : ""}`,
+      [currentPage, itemsPerPage, selectedStatus],
+    ),
+  );
   const paginate = (pageNumber) => {
     setCurrentPage(pageNumber);
     refetch(
       `http://localhost:1000/api/v1/planpro/projects?page=${pageNumber}&limit=${itemsPerPage}`,
     );
   };
+
+  const currentProjects = data?.slice(indexOfFirstItem, indexOfLastItem);
 
   const deleteProject = async () => {
     try {
@@ -122,7 +125,9 @@ export const Projects = () => {
       console.error("Error deleting project:", error);
     }
   };
-
+  const handleFilterChange = (selectedStatus) => {
+    setSelectedStatus(selectedStatus);
+  };
   const headers = [
     { label: "Project ID", key: "id" },
     { label: "Project Name", key: "name" },
@@ -139,7 +144,7 @@ export const Projects = () => {
           onClick={() => navigate("/create-project")}
         />
         <Search />
-        <Filter filterElement="projects" />
+        <Filter filterElement="projects" onFilterChange={handleFilterChange} />
         <CSVLink data={data} headers={headers} filename="projects.csv">
           <DownloadIcon src={downloadIcon} alt="Download" />
         </CSVLink>
