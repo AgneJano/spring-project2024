@@ -2,6 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
+import SyncLoader from "react-spinners/SyncLoader";
 
 const RegistrationContainer = styled.div`
   display: flex;
@@ -92,9 +93,17 @@ const SubmitButton = styled.button`
   }
 `;
 
+const LoadingContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+`;
+
 const CreateProjectForm = () => {
   const navigate = useNavigate();
   const [errors, setErrors] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -108,6 +117,7 @@ const CreateProjectForm = () => {
   };
 
   const handleSubmit = async (e) => {
+    setLoading(true);
     if (errors !== null) {
       return;
     }
@@ -156,7 +166,13 @@ const CreateProjectForm = () => {
           />
         </FormField>
         <p>{errors}</p>
-        <SubmitButton type="submit">Submit</SubmitButton>
+        {loading ? (
+          <LoadingContainer>
+            <SyncLoader color={"#FFC107"} loading={loading} size={20} />
+          </LoadingContainer>
+        ) : (
+          <SubmitButton type="submit">Submit</SubmitButton>
+        )}
       </StyledForm>
     </RegistrationContainer>
   );
