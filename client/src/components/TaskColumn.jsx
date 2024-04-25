@@ -72,14 +72,14 @@ const StatusBubble = styled.img`
   width: 1.375rem;
 `;
 
-function TaskColumn({ title, tasks, id }) {
+function TaskColumn({ tasks, title, mainStatus }) {
   const onDeleteClick = async (taskId) => {};
-
+  console.log("statusewlis", tasks);
   return (
     <ColumnContainer>
       <Header>
         <StatusBubble
-          src={getStatusSvgUrl(tasks[0].status)}
+          src={getStatusSvgUrl(mainStatus)}
           alt="Task status bubble"
         />
         <ColumnTitle>{title}</ColumnTitle>
@@ -98,7 +98,7 @@ function TaskColumn({ title, tasks, id }) {
                 src={deleteIcon}
                 onClick={() => {
                   console.log("Icon clicked"); // Add this line for debugging
-                  onDeleteClick(id);
+                  onDeleteClick(task.id);
                 }}
               />
             </ImageContainer>

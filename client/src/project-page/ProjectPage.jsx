@@ -1,17 +1,15 @@
-
 import { useNavigate } from "react-router-dom";
-import { styled } from 'styled-components';
-import { useParams } from 'react-router-dom';
-import SyncLoader from 'react-spinners/SyncLoader';
-import TaskColumn from '../components/TaskColumn';
-import downloadIcon from '../assets/download.svg';
-import Search from '../components/Search';
-import CreateButton from '../components/CreateButton';
-import { getStatusSvgUrl } from '../mainFunctions';
-import { useMemo, useState } from 'react';
-import { useFetch } from '../fetching-data/UseFetch';
-import { CSVLink } from 'react-csv';
-
+import { styled } from "styled-components";
+import { useParams } from "react-router-dom";
+import SyncLoader from "react-spinners/SyncLoader";
+import TaskColumn from "../components/TaskColumn";
+import downloadIcon from "../assets/download.svg";
+import Search from "../components/Search";
+import CreateButton from "../components/CreateButton";
+import { getStatusSvgUrl } from "../mainFunctions";
+import { useMemo, useState, useEffect } from "react";
+import { useFetch } from "../fetching-data/UseFetch";
+import { CSVLink } from "react-csv";
 
 const ProjectPageContainer = styled.div`
   max-width: 1180px;
@@ -50,7 +48,7 @@ const DownloadIcon = styled.img`
 const ColumnsContainer = styled.div`
   display: flex;
   justify-content: space-between;
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
 `;
 
 const TaskColumnWrapper = styled.div`
@@ -69,19 +67,19 @@ const StatusBubble = styled.img`
 const Title = styled.p`
   font-weight: 500;
   font-size: 1.25rem;
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
 `;
 
 const DescriptionTitle = styled.p`
   font-weight: 500;
   font-size: 1rem;
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
 `;
 
 const Description = styled.p`
   font-size: 1rem;
   line-height: 1.25rem;
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
 `;
 
 const DescriptionContainer = styled.div`
@@ -108,50 +106,58 @@ const LoadingContainer = styled.div`
 function ProjectPage() {
   const { id } = useParams();
 
-
-
   const { data: projectData, loading: projectLoading } = useFetch(
-    useMemo(() => `http://localhost:1000/api/v1/planpro/projects/${id}`, []),
+    useMemo(() => `http://localhost:1000/api/v1/planpro/projects/${id}`, [id]),
   );
   const { data: tasksData, loading: tasksLoading } = useFetch(
-    useMemo(() => `http://localhost:1000/api/v1/planpro/tasks`, []),
-
+    useMemo(
+      () => `http://localhost:1000/api/v1/planpro/projects/${id}/tasks`,
+      [id],
+    ),
   );
-
+  console.log(tasksData);
   const navigate = useNavigate();
 
-  // const [tasksToDo, setTasksToDo] = useState([]);
-  // const [tasksInProgress, setTasksInProgress] = useState([]);
-  // const [tasksDone, setTasksDone] = useState([]);
+  const [tasksToDo, setTasksToDo] = useState([]);
+  const [tasksInProgress, setTasksInProgress] = useState([]);
+  const [tasksDone, setTasksDone] = useState([]);
 
-  // useEffect(() => {
-  //   if (tasksData) {
-  //     setTasksToDo(tasksData.filter((task) => task.status === 'to-do'));
-  //     setTasksInProgress(tasksData.filter((task) => task.status === 'in-progress'));
-  //     setTasksDone(tasksData.filter((task) => task.status === 'done'));
-  //   }
-  // }, [tasksData]);
+  useEffect(() => {
+    if (projectData && tasksData) {
+      const filteredTasks = tasksData.reduce(
+        (acc, task) => {
+          if (task.status === "to-do") acc.toDo.push(task);
+          else if (task.status === "in-progress") acc.inProgress.push(task);
+          else if (task.status === "done") acc.done.push(task);
+          return acc;
+        },
+        { toDo: [], inProgress: [], done: [] },
+      );
 
-  // const tasksData = data ? [data] : [];
+      setTasksToDo(filteredTasks.toDo);
+      setTasksInProgress(filteredTasks.inProgress);
+      setTasksDone(filteredTasks.done);
+    }
+  }, [projectData, tasksData]);
 
-  // const tasksToDo = tasksData.filter((task) => task.status === 'to-do');
-  // const tasksInProgress = tasksData.filter((task) => task.status === 'in-progress');
-  // const tasksDone = tasksData.filter((task) => task.status === 'done');
   const url = getStatusSvgUrl(projectData?.status);
 
   const headers = [
-    { label: 'Task ID', key: 'id' },
-    { label: 'Task Name', key: 'name' },
-    { label: 'Description', key: 'description' },
-    { label: 'Priority', key: 'priority' },
-    { label: 'Status', key: 'status' },
+    { label: "Task ID", key: "id" },
+    { label: "Task Name", key: "name" },
+    { label: "Description", key: "description" },
+    { label: "Priority", key: "priority" },
+    { label: "Status", key: "status" },
   ];
-
   return (
     <>
-      {(projectLoading || tasksLoading) ? (
+      {projectLoading || tasksLoading ? (
         <LoadingContainer>
-          <SyncLoader color={'#FFC107'} loading={projectLoading || tasksLoading} size={20} />
+          <SyncLoader
+            color={"#FFC107"}
+            loading={projectLoading || tasksLoading}
+            size={20}
+          />
         </LoadingContainer>
       ) : (
         <ProjectPageContainer>
@@ -167,25 +173,51 @@ function ProjectPage() {
           )}
           <ButtonContainer>
             <ButtonsContainer>
-              <CreateButton buttonTitle="Add task"
-                onClick={() => navigate(`/projects/${id}/create-task`)} />
+              <CreateButton
+                buttonTitle="Add task"
+                onClick={() => navigate(`/projects/${id}/create-task`)}
+              />
               <Search />
               <CSVLink data={tasksData} headers={headers} filename="tasks.csv">
                 <DownloadIcon src={downloadIcon} alt="Download" />
               </CSVLink>
             </ButtonsContainer>
           </ButtonContainer>
-          <ColumnsContainer>
-          <TaskColumnWrapper>
-              {/* <TaskColumn title="To Do" tasks={tasksToDo} /> */}
-            </TaskColumnWrapper>
-            <TaskColumnWrapper>
-              {/* <TaskColumn title="In progress" tasks={tasksInProgress} /> */}
-            </TaskColumnWrapper>
-            <TaskColumnWrapper>
-              {/* <TaskColumn title="Done" tasks={tasksDone} /> */}
-            </TaskColumnWrapper>
-          </ColumnsContainer>
+          {tasksLoading ? (
+            <LoadingContainer>
+              <SyncLoader color={"#FFC107"} loading={loading} size={20} />
+            </LoadingContainer>
+          ) : (
+            <ColumnsContainer>
+              {tasksToDo.length !== 0 && (
+                <TaskColumnWrapper>
+                  <TaskColumn
+                    title="To Do"
+                    tasks={tasksToDo}
+                    mainStatus="to-do"
+                  />
+                </TaskColumnWrapper>
+              )}
+              {tasksInProgress.length !== 0 && (
+                <TaskColumnWrapper>
+                  <TaskColumn
+                    title="In progress"
+                    tasks={tasksInProgress}
+                    mainStatus="in-progress"
+                  />
+                </TaskColumnWrapper>
+              )}
+              {tasksDone.length !== 0 && (
+                <TaskColumnWrapper>
+                  <TaskColumn
+                    title="Done"
+                    tasks={tasksDone}
+                    mainStatus="done"
+                  />
+                </TaskColumnWrapper>
+              )}
+            </ColumnsContainer>
+          )}
         </ProjectPageContainer>
       )}
     </>

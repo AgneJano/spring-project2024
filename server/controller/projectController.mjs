@@ -83,11 +83,10 @@ const projectController = {
   getTasksByProjectsId: async (req, res) => {
     try {
       const projectId = req.params.id;
-      const project = await projectModel.getTasksByProjectsId(projectId);
-      if (!project) {
-        return res.status(404).json({ message: "Project not found" });
-      }
-      res.status(200).json(project);
+      console.log("Project ID:", projectId); // Add logging here to check the project ID
+      const tasks = await projectModel.getTasksByProjectsId(projectId);
+      console.log("Tasks:", tasks); // Add logging here to check the tasks retrieved
+      res.status(200).json(tasks);
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: "Internal server error" });
