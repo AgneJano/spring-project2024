@@ -104,79 +104,104 @@ const SubmitButton = styled.button`
   }
 `;
 const CreateTaskForm = () => {
-    const { id } = useParams();
-    const navigate = useNavigate();
-    const [formData, setFormData] = useState({
-      name: "",
-      description: "",
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    name: "",
+    description: "",
+  });
+  const [priority, setPriority] = useState("medium"); // State variable for priority
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
     });
-    const [priority, setPriority] = useState("medium"); // State variable for priority
-  
-    const handleChange = (e) => {
-      setFormData({
-        ...formData,
-        [e.target.name]: e.target.value,
-      });
-    };
-  
-    const handlePriorityChange = (e) => {
-      setPriority(e.target.value);
-    };
-  
-    const handleSubmit = async (e) => {
-      e.preventDefault();
-      try {
-        await axios.post(
-          `http://localhost:1000/api/v1/planpro/projects/${id}/tasks`,
-          { ...formData, priority } // Pass priority in the request
-        );
-  
-        navigate(`/projects/${id}/tasks`);
-      } catch (error) {
-        console.error("Error creating project:", error);
-      }
-    };
-  
-    return (
-      <RegistrationContainer>
-        <FormTitle>Create new task</FormTitle>
-        <StyledForm onSubmit={handleSubmit}>
-          <FormField>
-            <Label htmlFor="name">Name:</Label>
-            <Input
-              type="text"
-              id="name"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-            />
-          </FormField>
-          <FormField>
-            <Label htmlFor="description">Description:</Label>
-            <TextArea
-              id="description"
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-            />
-          </FormField>
-          <FormField>
-            <Label htmlFor="priority">Priority:</Label>
-            <PrioritySelect
-              id="priority"
-              name="priority"
-              value={priority}
-              onChange={handlePriorityChange}
-            >
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
-            </PrioritySelect>
-          </FormField>
-          <SubmitButton type="submit">Submit</SubmitButton>
-        </StyledForm>
-      </RegistrationContainer>
-    );
   };
-  
-  export default CreateTaskForm;
+
+  const handlePriorityChange = (e) => {
+    setPriority(e.target.value);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post(
+        `http://localhost:1000/api/v1/planpro/projects/${id}/tasks`,
+        { ...formData, priority } // Pass priority in the request
+      );
+
+      navigate(`/projects/${id}`);
+    } catch (error) {
+      console.error("Error creating project:", error);
+    }
+  };
+
+  return (
+    <RegistrationContainer>
+      <FormTitle>Create new task</FormTitle>
+      <StyledForm onSubmit={handleSubmit}>
+        <FormField>
+          <Label htmlFor="name">Name:</Label>
+          <Input
+            type="text"
+            id="name"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            minLength={2}
+            maxLength={50}
+            required
+          />
+          {formData.name && formData.name.length === 0 && (
+            <span style={{ color: 'red' }}>Name is required.</span>
+          )}
+          {formData.name && formData.name.length < 2 && (
+            <span style={{ color: 'red' }}>Name must be at least 2 characters long.</span>
+          )}
+          {formData.name && formData.name.length > 50 && (
+            <span style={{ color: 'red' }}>Name must be at most 50 characters long.</span>
+          )}
+        </FormField>
+        <FormField>
+          <Label htmlFor="description">Description:</Label>
+          <TextArea
+            id="description"
+            name="description"
+            value={formData.description}
+            onChange={handleChange}
+            minLength={2}
+            maxLength={10000}
+            required
+          />
+          {formData.description && formData.description.length === 0 && (
+            <span style={{ color: 'red' }}>Description is required.</span>
+          )}
+          {formData.description && formData.description.length < 2 && (
+            <span style={{ color: 'red' }}>Description must be at least 2 characters long.</span>
+          )}
+          {formData.description && formData.description.length === 10000 && (
+            <span style={{ color: 'red' }}>Description must be at most 10000 characters long.</span>
+          )}
+
+        </FormField>
+        <FormField>
+          <Label htmlFor="priority">Priority:</Label>
+          <PrioritySelect
+            id="priority"
+            name="priority"
+            value={priority}
+            onChange={handlePriorityChange}
+          >
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+          </PrioritySelect>
+        </FormField>
+        <SubmitButton type="submit">Submit</SubmitButton>
+      </StyledForm>
+    </RegistrationContainer>
+  );
+};
+
+export default CreateTaskForm;
