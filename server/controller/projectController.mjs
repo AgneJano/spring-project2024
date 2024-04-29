@@ -3,7 +3,7 @@ import projectModel from "../models/projectModel.mjs";
 const projectController = {
   getProjects: async (req, res) => {
     try {
-      console.log(req.query.status);
+      console.log(req.query);
       const projects = await projectModel.getProjects(req.query);
       res.status(200).json(projects);
     } catch (error) {
