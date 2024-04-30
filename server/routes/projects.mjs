@@ -22,4 +22,6 @@ router.post(
   validate(projectValidationSchema),
   projectController.createProject
 );
+router.patch("/:id", projectController.editProjectField);
+
 export default router;
