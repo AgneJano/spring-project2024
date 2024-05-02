@@ -136,6 +136,18 @@ const projectModel = {
       throw error;
     }
   },
+
+  getTaskById: async (projectId, taskId) => {
+    try {
+      const query = "SELECT * FROM tasks WHERE project_id = $1 AND id = $2";
+      const result = await pool.query(query, [projectId, taskId]);
+      return result.rows[0];
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  },
+
   editProjectField: async (id, updatedFields) => {
     try {
       // Convert ID to integer to ensure it's valid for PostgreSQL queries
