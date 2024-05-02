@@ -104,8 +104,8 @@ function EditProjectPage() {
             `http://localhost:1000/api/v1/planpro/projects/${id}`
           );
           setFormData({
-            name: response.data.name,
-            description: response.data.description,
+            name: response.data?.name || "",
+            description: response.data?.description || "",
           });
         } catch (error) {
           console.error("Error fetching project:", error);
@@ -124,28 +124,28 @@ function EditProjectPage() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (errors) {
+    if (errors !== null) {
       return;
     }
-
+    e.preventDefault();
+  
     try {
+      console.log(formData);
       await axios.patch(
         `http://localhost:1000/api/v1/planpro/projects/${id}`,
         formData
       );
-
-      navigate(`/projects/${id}`); // Redirect to the project detail page or projects list
+  
+      navigate(`/projects/${id}`);
     } catch (error) {
-      setErrors(error.toString());
+      setErrors(error);
       console.error("Error updating project:", error);
     }
   };
 
   return (
     <RegistrationContainer>
-      <FormTitle>{id ? "Edit Project" : "Create New Project"}</FormTitle>
+      <FormTitle>Edit Project</FormTitle>
       <StyledForm onSubmit={handleSubmit}>
         <FormField>
           <Label htmlFor="name">Project Name:</Label>
@@ -165,11 +165,11 @@ function EditProjectPage() {
           <TextArea
             id="description"
             name="description"
-              value={formData.description}
-              onChange={handleChange}
-              minLength={2}
-              maxLength={10000}
-              required
+            value={formData.description}
+            onChange={handleChange}
+            minLength={2}
+            maxLength={10000}
+            required 
           />
         </FormField>
         <SubmitButton type="submit">Submit</SubmitButton>
