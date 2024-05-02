@@ -2,6 +2,7 @@ import styled from "styled-components";
 import editIcon from "../assets/icons/edit.svg";
 import deleteIcon from "../assets/icons/delete.svg";
 import { getStatusSvgUrl, getTaskIcons } from "../mainFunctions";
+import { Link } from "react-router-dom";
 
 const ColumnContainer = styled.div`
   flex: 1;
@@ -39,8 +40,13 @@ const TaskContent = styled.div`
   flex-direction: column;
 `;
 
-const TaskName = styled.span`
-  font-size: 16px;
+
+const StyledLink = styled(Link)`
+  text-decoration: none;
+  color: #000000;
+  cursor: pointer;
+  font-size: 16px
+  font-family: "Poppins", sans-serif;
 `;
 
 const TaskDate = styled.span`
@@ -89,7 +95,9 @@ function TaskColumn({ tasks, title, mainStatus }) {
           <TaskItem key={task.id}>
             <TaskContent>
               <TaskDate>{task.date}</TaskDate>
-              <TaskName>{task.name}</TaskName>
+              <StyledLink to={`/projects/${task.project_id}/tasks/${task.id}`}>
+              {task.name}
+            </StyledLink>
             </TaskContent>
             <ImageContainer>
               <img src={getTaskIcons(task.priority)} alt="Priority Icon" />
@@ -102,7 +110,6 @@ function TaskColumn({ tasks, title, mainStatus }) {
                 }}
               />
             </ImageContainer>
-            {/* <Line /> */}
           </TaskItem>
         ))}
       </TaskList>

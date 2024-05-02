@@ -92,6 +92,24 @@ const projectController = {
       res.status(500).json({ message: "Internal server error" });
     }
   },
+
+  getTaskById: async (req, res) => {
+    try {
+      const projectId = req.params.projectId;
+      const taskId = req.params.taskId;
+      console.log("Project ID:", projectId);
+      console.log("Task ID:", taskId);
+      const task = await projectModel.getTaskById(projectId, taskId);
+      console.log("Task:", task);
+      res.status(200).json(task);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  },
+
+
+
 };
 
 export default projectController;
