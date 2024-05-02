@@ -3,61 +3,61 @@ import { pool } from "../db/postgresConnection.mjs";
 const projectModel = {
   getProjects: async (query) => {
     try {
-        // Validate and set default values for query parameters
-        const status = query.status;
-        const paginate = query.paginate === "true";
-        const page = parseInt(query.page) || 1;
-        const limit = parseInt(query.limit) || 12;
-        const name = query.name;
-        const description = query.description;
+      // Validate and set default values for query parameters
+      const status = query.status;
+      const paginate = query.paginate === "true";
+      const page = parseInt(query.page) || 1;
+      const limit = parseInt(query.limit) || 12;
+      const name = query.name;
+      const description = query.description;
 
-        if (status && paginate) {
-            // Case 1: When user needs to use both paginate and status together
-            const offset = (page - 1) * limit;
-            const projects = await pool.query(
-                "SELECT * FROM projects WHERE status = $1 OFFSET $2 LIMIT $3",
-                [status, offset, limit]
-            );
-            return projects.rows;
-        } else if (status) {
-            // Case 2: Only status
-            const projects = await pool.query(
-                "SELECT * FROM projects WHERE status = $1",
-                [status]
-            );
-            return projects.rows;
-        } else if (name) {
-            // Case 3: Only name
-            const projects = await pool.query(
-                "SELECT * FROM projects WHERE name LIKE $1",
-                [`%${name}%`]
-            );
-            return projects.rows;
-        } else if (description) {
-            // Case 4: Only description
-            const projects = await pool.query(
-                "SELECT * FROM projects WHERE description LIKE $1",
-                [`%${description}%`]
-            );
-            return projects.rows;
-        } else if (paginate) {
-            // Case 5: Only paginate
-            const offset = (page - 1) * limit;
-            const projects = await pool.query(
-                "SELECT * FROM projects OFFSET $1 LIMIT $2",
-                [offset, limit]
-            );
-            return projects.rows;
-        } else {
-            // No filters or paginate provided, retrieve all projects
-            const projects = await pool.query("SELECT * FROM projects");
-            return projects.rows;
-        }
+      if (status && paginate) {
+        // Case 1: When user needs to use both paginate and status together
+        const offset = (page - 1) * limit;
+        const projects = await pool.query(
+          "SELECT * FROM projects WHERE status = $1 OFFSET $2 LIMIT $3",
+          [status, offset, limit]
+        );
+        return projects.rows;
+      } else if (status) {
+        // Case 2: Only status
+        const projects = await pool.query(
+          "SELECT * FROM projects WHERE status = $1",
+          [status]
+        );
+        return projects.rows;
+      } else if (name) {
+        // Case 3: Only name
+        const projects = await pool.query(
+          "SELECT * FROM projects WHERE name LIKE $1",
+          [`%${name}%`]
+        );
+        return projects.rows;
+      } else if (description) {
+        // Case 4: Only description
+        const projects = await pool.query(
+          "SELECT * FROM projects WHERE description LIKE $1",
+          [`%${description}%`]
+        );
+        return projects.rows;
+      } else if (paginate) {
+        // Case 5: Only paginate
+        const offset = (page - 1) * limit;
+        const projects = await pool.query(
+          "SELECT * FROM projects OFFSET $1 LIMIT $2",
+          [offset, limit]
+        );
+        return projects.rows;
+      } else {
+        // No filters or paginate provided, retrieve all projects
+        const projects = await pool.query("SELECT * FROM projects");
+        return projects.rows;
+      }
     } catch (error) {
-        console.error(error);
-        throw error;
+      console.error(error);
+      throw error;
     }
-},
+  },
   getProjectsById: async (id) => {
     try {
       const query = "SELECT * FROM projects WHERE id = $1";
@@ -135,8 +135,6 @@ const projectModel = {
     }
   },
 
-
-
   getTaskById: async (projectId, taskId) => {
     try {
       const query = "SELECT * FROM tasks WHERE project_id = $1 AND id = $2";
@@ -148,7 +146,42 @@ const projectModel = {
     }
   },
 
+  editProjectField: async (id, updatedFields) => {
+    try {
+      // Convert ID to integer to ensure it's valid for PostgreSQL queries
+      const projectId = parseInt(id, 10);
+      if (isNaN(projectId)) {
+        throw new Error('Invalid project ID');
+      }
 
+      // Validate the updated fields to avoid updating with empty or invalid data
+      if (!updatedFields || typeof updatedFields !== 'object' || Object.keys(updatedFields).length === 0) {
+        throw new Error('Invalid updated fields');
+      }
+
+      // Create the query's set fields and values
+      const setFields = Object.keys(updatedFields)
+        .map((key, i) => `${key} = $${i + 1}`)
+        .join(', ');
+
+      const values = [...Object.values(updatedFields), projectId]; // Correct order of values
+
+      // Execute the query with parameterized inputs
+      const result = await pool.query(
+        `UPDATE projects SET ${setFields} WHERE id = $${values.length} RETURNING *`,
+        values,
+      );
+
+      if (result.rowCount === 0) { // No project found with the given ID
+        throw new Error('Project not found');
+      }
+
+      return result.rows[0]; // Return the updated project
+    } catch (error) {
+      console.error("Error in editProjectField:", error.message); // Log the error message
+      throw error; // Re-throw the error to handle it elsewhere
+    }
+  },
 };
 
 export default projectModel;

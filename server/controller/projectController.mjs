@@ -108,7 +108,27 @@ const projectController = {
     }
   },
 
+  editProjectField: async (req, res) => {
+    try {
+      // Iš request'o parametrų ištraukiame vartotojo ID
+      const id = req.params.id;
+      // Iš request'o body ištraukiame laukus, kuriuos norime atnaujinti
+      const updatedFields = req.body;
 
+      const project = await projectModel.editProjectField(id, updatedFields);
+      if (!project) {
+        res.status(404).json({ message: 'Project not found.' });
+        return;
+      }
+
+      res.status(200).json(project);
+    } catch (err) {
+      console.error(err);
+      res
+        .status(500)
+        .json({ message: 'An error occurred while updating the project.' });
+    }
+  }
 
 };
 

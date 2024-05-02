@@ -129,7 +129,7 @@ export const ProjectCard = ({
               src={editIcon}
               onClick={(e) => {
                 e.stopPropagation();
-                console.log("edit");
+                navigate(`/projects/${id}/edit`)
               }}
             />
             {isVisibleDelete && (
