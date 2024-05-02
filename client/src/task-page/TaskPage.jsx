@@ -1,15 +1,44 @@
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import styled from 'styled-components';
+import { useEffect, useState } from 'react';
+import { getTaskIcons, getStatusSvgUrl } from '../mainFunctions';
+import editIcon from '../assets/icons/edit.svg';
+import deleteIcon from '../assets/icons/delete.svg';
 
 const TaskPageWrapper = styled.div`
   font-family: 'Poppins', sans-serif;
   display: flex;
   flex-direction: column;
   align-items: center;
+  width: 60%;
+  margin: 6.25rem auto;
+  padding: 20px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+`;
+
+const DetailItem = styled.div`
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid #eee;
+
+  h2 {
+    font-size: 16px;
+    color: #818181;
+    font-family: 'Poppins', sans-serif;
+    margin-bottom: 0.5rem;
+    font-weight: normal;
+  }
+
+  p {
+    font-size: 20px;
+    font-family: 'Poppins', sans-serif;
+    margin: 10px 0;
+  }
 `;
 
 const TaskDetails = styled.div`
   margin-bottom: 20px;
+  width: 100%;
 `;
 
 const TaskActions = styled.div`
@@ -19,42 +48,153 @@ const TaskActions = styled.div`
 
   button {
     margin-right: 10px;
+    background-color: #4caf50;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+  }
+`;
+const TaskActionsContainer = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  margin-bottom: 20px;
+`;
+
+const ImageContainer = styled.p`
+  display: flex;
+  gap: 0.5rem;
+`;
+const StyledIcon = styled.img`
+  cursor: pointer;
+  &:hover {
+    filter: brightness(0.5);
+    transform: scale(0.9);
   }
 `;
 
-const BackButton = styled.button`
-  font-family: 'Poppins', sans-serif;
-  background-color: #4CAF50;
-  border: none;
-  color: white;
-  padding: 10px 20px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 16px;
-  cursor: pointer;
-  border-radius: 5px;
+const StatusandPriorityContainer = styled.div`
+  display: flex;
+  align-items: center;
 `;
 
-const TaskPage = ({ task, handleDelete }) => {
-  const { taskId, title, description, status, priority, createDate, editDate } = task;
+const StatusandPriorityIcon = styled.img`
+  margin-right: 10px;
+`;
+
+const TaskStatusandPriority = styled.p`
+  font-size: 20px;
+  font-family: 'Poppins', sans-serif;
+`;
+
+const TaskPage = () => {
+  const { projectId, taskId } = useParams();
+  const [task, setTask] = useState(null);
+
+  const getStatusDisplayText = (status) => {
+    const statusMap = {
+      'to-do': 'To do',
+      'in-progress': 'In Progress',
+      'done': 'Done',
+    };
+    return statusMap[status] || status;
+  };
+
+  const getPriorityDisplayText = (priority) => {
+    const priorityMap = {
+      'high': 'High',
+      'medium': 'Medium',
+      'low': 'Low',
+    };
+    return priorityMap[priority] || priority;
+  };
+
+  //   const onDeleteClick = async (taskId) => {};
+
+  useEffect(() => {
+    const fetchTask = async () => {
+      try {
+        const response = await fetch(`http://localhost:1000/api/v1/planpro/projects/${projectId}/tasks/${taskId}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch task');
+        }
+        const data = await response.json();
+        setTask(data);
+        console.log(data);
+      } catch (error) {
+        console.error('Error fetching task:', error);
+      }
+    };
+
+    fetchTask();
+  }, [projectId, taskId]);
+
+  // const handleDelete = (taskId) => {
+  //   console.log('Deleting task with ID:', taskId);
+  // };
 
   return (
     <TaskPageWrapper>
-      <TaskDetails>
-        <h2>Task ID: {taskId}</h2>
-        <h3>Title: {title}</h3>
-        <p>Description: {description}</p>
-        <p>Status: {status}</p>
-        <p>Priority: {priority}</p>
-        <p>Create Date: {createDate}</p>
-        <p>Edit Date: {editDate}</p>
-      </TaskDetails>
-      <TaskActions>
-        <Link to={`/tasks/edit/${taskId}`}><button><i className="fas fa-edit"></i> Edit</button></Link>
-        <button onClick={() => handleDelete(taskId)}><i className="fas fa-trash-alt"></i> Delete</button>
-      </TaskActions>
-      <Link to="/tasks"><BackButton>Back</BackButton></Link>
+      <TaskActionsContainer>
+        <TaskActions>
+          <ImageContainer>
+            <Link to={`/projects/${projectId}/tasks/${taskId}/edit`}>
+              <StyledIcon src={editIcon} />
+            </Link>
+            <StyledIcon
+              src={deleteIcon}
+              onClick={() => {
+                console.log('Icon clicked');
+                handleDelete(task?.id);
+              }}
+            />
+          </ImageContainer>
+        </TaskActions>
+      </TaskActionsContainer>
+      {task && (
+        <TaskDetails>
+          <DetailItem>
+            <h2>Task ID:</h2>
+            <p>{task.id}</p>
+          </DetailItem>
+          <DetailItem>
+            <h2>Title:</h2>
+            <p>{task.name}</p>
+          </DetailItem>
+          <DetailItem>
+            <h2>Description:</h2>
+            <p>{task.description}</p>
+          </DetailItem>
+          <DetailItem>
+            <h2>Status:</h2>
+            <StatusandPriorityContainer>
+              <StatusandPriorityIcon src={getStatusSvgUrl(task?.status)} alt="Status Icon" />
+              <TaskStatusandPriority>{getStatusDisplayText(task.status)}</TaskStatusandPriority>
+            </StatusandPriorityContainer>
+          </DetailItem>
+          <DetailItem>
+            <h2>Priority:</h2>
+            <StatusandPriorityContainer>
+              <StatusandPriorityIcon src={getTaskIcons(task?.priority)} alt="Priority Icon" />
+              <TaskStatusandPriority>{getPriorityDisplayText(task.priority)}</TaskStatusandPriority>
+            </StatusandPriorityContainer>
+          </DetailItem>
+          <DetailItem>
+  <h2>Create date:</h2>
+  <p>{task.created_on.split('T')[0]}</p>
+</DetailItem>
+<DetailItem>
+  <h2>Edit date:</h2>
+  <p>{task.updated_on.split('T')[0]}</p>
+</DetailItem>
+        </TaskDetails>
+      )}
+      {!task && <p>Loading...</p>}
     </TaskPageWrapper>
   );
 };
