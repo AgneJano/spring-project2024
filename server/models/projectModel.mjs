@@ -10,6 +10,7 @@ const projectModel = {
       const limit = parseInt(query.limit) || 12;
       const name = query.name;
 
+
       if (status && paginate) {
         // Case 1: When user needs to use both paginate and status together
         const offset = (page - 1) * limit;
@@ -134,6 +135,42 @@ const projectModel = {
     } catch (error) {
       console.error(error);
       throw error;
+    }
+  },
+  editProjectField: async (id, updatedFields) => {
+    try {
+      // Convert ID to integer to ensure it's valid for PostgreSQL queries
+      const projectId = parseInt(id, 10);
+      if (isNaN(projectId)) {
+        throw new Error('Invalid project ID');
+      }
+
+      // Validate the updated fields to avoid updating with empty or invalid data
+      if (!updatedFields || typeof updatedFields !== 'object' || Object.keys(updatedFields).length === 0) {
+        throw new Error('Invalid updated fields');
+      }
+
+      // Create the query's set fields and values
+      const setFields = Object.keys(updatedFields)
+        .map((key, i) => `${key} = $${i + 1}`)
+        .join(', ');
+
+      const values = [...Object.values(updatedFields), projectId]; // Correct order of values
+
+      // Execute the query with parameterized inputs
+      const result = await pool.query(
+        `UPDATE projects SET ${setFields} WHERE id = $${values.length} RETURNING *`,
+        values,
+      );
+
+      if (result.rowCount === 0) { // No project found with the given ID
+        throw new Error('Project not found');
+      }
+
+      return result.rows[0]; // Return the updated project
+    } catch (error) {
+      console.error("Error in editProjectField:", error.message); // Log the error message
+      throw error; // Re-throw the error to handle it elsewhere
     }
   },
 };
