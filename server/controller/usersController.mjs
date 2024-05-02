@@ -50,7 +50,6 @@ const userController = {
         .json({ message: "An error occurred while creating the user." });
     }
   },
-
   login: async (req, res) => {
     try {
       const { email } = req.body;

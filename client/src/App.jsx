@@ -11,6 +11,8 @@ import { Projects } from "./projects/Projects";
 import CreateProjectForm from "./create-project/CreateProjectForm";
 import CreateTaskForm from "./create-tasks/CreateTaskForm";
 import TaskPage from "./task-page/TaskPage";
+import LogPage from "./logs/LogPage";
+
 
 function App() {
   const { isAuthenticated } = useContext(AuthContext);
@@ -32,6 +34,7 @@ function App() {
             <Route path="/create-project" element={<CreateProjectForm />} />
             <Route path="/projects/:id/create-task" element={<CreateTaskForm />} />
             <Route path="/tasks/:id" element={<TaskPage />} />
+            <Route path="/logs" element={<LogPage/>} />
           </>
         ) : (
           <>
