@@ -9,7 +9,7 @@ const projectModel = {
       const page = parseInt(query.page) || 1;
       const limit = parseInt(query.limit) || 12;
       const name = query.name;
-      const description = query.description;
+
 
       if (status && paginate) {
         // Case 1: When user needs to use both paginate and status together
@@ -21,11 +21,21 @@ const projectModel = {
         return projects.rows;
       } else if (status) {
         // Case 2: Only status
-        const projects = await pool.query(
-          "SELECT * FROM projects WHERE status = $1",
-          [status]
-        );
-        return projects.rows;
+        if (name) {
+          // If name is provided, filter by status and name
+          const projects = await pool.query(
+            "SELECT * FROM projects WHERE status = $1 AND name LIKE $2",
+            [status, `%${name}%`]
+          );
+          return projects.rows;
+        } else {
+          // If name is not provided, only filter by status
+          const projects = await pool.query(
+            "SELECT * FROM projects WHERE status = $1",
+            [status]
+          );
+          return projects.rows;
+        }
       } else if (name) {
         // Case 3: Only name
         const projects = await pool.query(
@@ -33,15 +43,8 @@ const projectModel = {
           [`%${name}%`]
         );
         return projects.rows;
-      } else if (description) {
-        // Case 4: Only description
-        const projects = await pool.query(
-          "SELECT * FROM projects WHERE description LIKE $1",
-          [`%${description}%`]
-        );
-        return projects.rows;
       } else if (paginate) {
-        // Case 5: Only paginate
+        // Case 4: Only paginate
         const offset = (page - 1) * limit;
         const projects = await pool.query(
           "SELECT * FROM projects OFFSET $1 LIMIT $2",
@@ -85,9 +88,9 @@ const projectModel = {
   },
   deleteProject: async (id) => {
     try {
-      const query = "DELETE FROM projects WHERE id = $1 RETURNING *";
+      const query = "DELETE FROM projects WHERE id = $1";
       const result = await pool.query(query, [id]);
-      return result.rows[0];
+      return result.rows;
     } catch (error) {
       console.error(error);
       throw error;
