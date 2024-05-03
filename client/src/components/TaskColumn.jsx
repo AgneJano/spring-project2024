@@ -74,7 +74,6 @@ const StatusBubble = styled.img`
 
 function TaskColumn({ tasks, title, mainStatus }) {
   const onDeleteClick = async (taskId) => {};
-  console.log("statusewlis", tasks);
   return (
     <ColumnContainer>
       <Header>

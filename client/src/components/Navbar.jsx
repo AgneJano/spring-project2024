@@ -132,9 +132,6 @@ function Navbar() {
                   <img src={account_icon} alt="Account icon" />
                 </Icon>
                 <DropdownContent isOpen={isMenuOpen}>
-                  <DropdownItem>
-                    <Link to="/profile">Profile</Link>
-                  </DropdownItem>
                   <DropdownItem onClick={handleLogout}>
                     <LogoutLink>Log out</LogoutLink>
                   </DropdownItem>

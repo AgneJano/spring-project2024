@@ -1,6 +1,5 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { styled } from "styled-components";
-import { useParams } from "react-router-dom";
 import SyncLoader from "react-spinners/SyncLoader";
 import TaskColumn from "../components/TaskColumn";
 import downloadIcon from "../assets/download.svg";
@@ -105,25 +104,22 @@ const LoadingContainer = styled.div`
 
 function ProjectPage() {
   const { id } = useParams();
-
-  const { data: projectData, loading: projectLoading } = useFetch(
-    useMemo(() => `http://localhost:1000/api/v1/planpro/projects/${id}`, [id]),
-  );
-  const { data: tasksData, loading: tasksLoading } = useFetch(
-    useMemo(
-      () => `http://localhost:1000/api/v1/planpro/projects/${id}/tasks`,
-      [id],
-    ),
-  );
-  console.log(tasksData);
-  const navigate = useNavigate();
-
   const [tasksToDo, setTasksToDo] = useState([]);
   const [tasksInProgress, setTasksInProgress] = useState([]);
   const [tasksDone, setTasksDone] = useState([]);
-
+  const projects = JSON.parse(sessionStorage.getItem("projects"));
+  const projectData = projects.find((project) => project.id === parseInt(id));
+console.log('fetchinA')
+  const {
+    data: tasksData,
+    loading: tasksLoading,
+    refetch: refetchAllTasks,
+  } = useFetch(
+    `http://localhost:1000/api/v1/planpro/projects/${id}/tasks`,
+    `project-id${id}_tasks`,
+  );
   useEffect(() => {
-    if (projectData && tasksData) {
+    if (tasksData) {
       const filteredTasks = tasksData.reduce(
         (acc, task) => {
           if (task.status === "to-do") acc.toDo.push(task);
@@ -133,12 +129,13 @@ function ProjectPage() {
         },
         { toDo: [], inProgress: [], done: [] },
       );
-
       setTasksToDo(filteredTasks.toDo);
       setTasksInProgress(filteredTasks.inProgress);
       setTasksDone(filteredTasks.done);
     }
-  }, [projectData, tasksData]);
+  }, [tasksData]);
+  const navigate = useNavigate();
+
 
   const url = getStatusSvgUrl(projectData?.status);
 
@@ -151,13 +148,9 @@ function ProjectPage() {
   ];
   return (
     <>
-      {projectLoading || tasksLoading ? (
+      {tasksLoading ? (
         <LoadingContainer>
-          <SyncLoader
-            color={"#FFC107"}
-            loading={projectLoading || tasksLoading}
-            size={20}
-          />
+          <SyncLoader color={"#FFC107"} loading={tasksLoading} size={20} />
         </LoadingContainer>
       ) : (
         <ProjectPageContainer>
@@ -185,7 +178,7 @@ function ProjectPage() {
           </ButtonContainer>
           {tasksLoading ? (
             <LoadingContainer>
-              <SyncLoader color={"#FFC107"} loading={loading} size={20} />
+              <SyncLoader color={"#FFC107"} loading={tasksLoading} size={20} />
             </LoadingContainer>
           ) : (
             <ColumnsContainer>
