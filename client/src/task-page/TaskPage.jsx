@@ -22,7 +22,7 @@ const DetailItem = styled.div`
   border-bottom: 1px solid #eee;
 
   h2 {
-    font-size: 16px;
+    font-size: 0.85rem;
     color: #818181;
     font-family: 'Poppins', sans-serif;
     margin-bottom: 0.5rem;
@@ -30,7 +30,7 @@ const DetailItem = styled.div`
   }
 
   p {
-    font-size: 20px;
+    font-size: 1.10rem;
     font-family: 'Poppins', sans-serif;
     margin: 10px 0;
   }
@@ -159,12 +159,12 @@ const TaskPage = () => {
       {task && (
         <TaskDetails>
           <DetailItem>
-            <h2>Task ID:</h2>
-            <p>{task.id}</p>
-          </DetailItem>
-          <DetailItem>
             <h2>Title:</h2>
             <p>{task.name}</p>
+          </DetailItem>
+          <DetailItem>
+            <h2>Task ID:</h2>
+            <p>{task.id}</p>
           </DetailItem>
           <DetailItem>
             <h2>Description:</h2>
