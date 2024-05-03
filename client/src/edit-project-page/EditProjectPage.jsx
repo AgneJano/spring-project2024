@@ -124,10 +124,10 @@ function EditProjectPage() {
   };
 
   const handleSubmit = async (e) => {
+    e.preventDefault();
     if (errors !== null) {
       return;
     }
-    e.preventDefault();
   
     try {
       console.log(formData);
