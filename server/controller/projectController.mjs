@@ -3,7 +3,7 @@ import projectModel from "../models/projectModel.mjs";
 const projectController = {
   getProjects: async (req, res) => {
     try {
-      console.log(req.query.status);
+      console.log(req.query);
       const projects = await projectModel.getProjects(req.query);
       res.status(200).json(projects);
     } catch (error) {
@@ -92,6 +92,44 @@ const projectController = {
       res.status(500).json({ message: "Internal server error" });
     }
   },
+
+  getTaskById: async (req, res) => {
+    try {
+      const projectId = req.params.projectId;
+      const taskId = req.params.taskId;
+      console.log("Project ID:", projectId);
+      console.log("Task ID:", taskId);
+      const task = await projectModel.getTaskById(projectId, taskId);
+      console.log("Task:", task);
+      res.status(200).json(task);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  },
+
+  editProjectField: async (req, res) => {
+    try {
+      // Iš request'o parametrų ištraukiame vartotojo ID
+      const id = req.params.id;
+      // Iš request'o body ištraukiame laukus, kuriuos norime atnaujinti
+      const updatedFields = req.body;
+
+      const project = await projectModel.editProjectField(id, updatedFields);
+      if (!project) {
+        res.status(404).json({ message: 'Project not found.' });
+        return;
+      }
+
+      res.status(200).json(project);
+    } catch (err) {
+      console.error(err);
+      res
+        .status(500)
+        .json({ message: 'An error occurred while updating the project.' });
+    }
+  }
+
 };
 
 export default projectController;

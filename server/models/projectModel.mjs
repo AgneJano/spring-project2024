@@ -8,6 +8,9 @@ const projectModel = {
       const paginate = query.paginate === "true";
       const page = parseInt(query.page) || 1;
       const limit = parseInt(query.limit) || 12;
+      const name = query.name;
+
+
       if (status && paginate) {
         // Case 1: When user needs to use both paginate and status together
         const offset = (page - 1) * limit;
@@ -18,13 +21,30 @@ const projectModel = {
         return projects.rows;
       } else if (status) {
         // Case 2: Only status
+        if (name) {
+          // If name is provided, filter by status and name
+          const projects = await pool.query(
+            "SELECT * FROM projects WHERE status = $1 AND name LIKE $2",
+            [status, `%${name}%`]
+          );
+          return projects.rows;
+        } else {
+          // If name is not provided, only filter by status
+          const projects = await pool.query(
+            "SELECT * FROM projects WHERE status = $1",
+            [status]
+          );
+          return projects.rows;
+        }
+      } else if (name) {
+        // Case 3: Only name
         const projects = await pool.query(
-          "SELECT * FROM projects WHERE status = $1",
-          [status]
+          "SELECT * FROM projects WHERE name LIKE $1",
+          [`%${name}%`]
         );
         return projects.rows;
       } else if (paginate) {
-        // Case 3: Only paginate
+        // Case 4: Only paginate
         const offset = (page - 1) * limit;
         const projects = await pool.query(
           "SELECT * FROM projects OFFSET $1 LIMIT $2",
@@ -32,7 +52,7 @@ const projectModel = {
         );
         return projects.rows;
       } else {
-        // No status or paginate provided, retrieve all projects
+        // No filters or paginate provided, retrieve all projects
         const projects = await pool.query("SELECT * FROM projects");
         return projects.rows;
       }
@@ -68,9 +88,9 @@ const projectModel = {
   },
   deleteProject: async (id) => {
     try {
-      const query = "DELETE FROM projects WHERE id = $1 RETURNING *";
+      const query = "DELETE FROM projects WHERE id = $1";
       const result = await pool.query(query, [id]);
-      return result.rows[0];
+      return result.rows;
     } catch (error) {
       console.error(error);
       throw error;
@@ -88,20 +108,26 @@ const projectModel = {
   },
   createTaskForProjectId: async (taskData) => {
     try {
-      const {project_id, name, description, status = 'to-do', priority = 'medium' } = taskData;
-  
+      const {
+        project_id,
+        name,
+        description,
+        status = "to-do",
+        priority = "medium",
+      } = taskData;
+
       const result = await pool.query(
         "INSERT INTO tasks (project_id, name, description, status, priority) VALUES ($1, $2, $3, $4, $5) RETURNING *",
         [project_id, name, description, status, priority]
       );
-  
+
       return result.rows[0];
     } catch (error) {
       console.error(error);
       throw error;
     }
   },
-  getTasksByProjectsId:async (id) => {
+  getTasksByProjectsId: async (id) => {
     try {
       const query = "SELECT * FROM tasks WHERE project_id = $1";
       const result = await pool.query(query, [id]);
@@ -109,6 +135,54 @@ const projectModel = {
     } catch (error) {
       console.error(error);
       throw error;
+    }
+  },
+
+  getTaskById: async (projectId, taskId) => {
+    try {
+      const query = "SELECT * FROM tasks WHERE project_id = $1 AND id = $2";
+      const result = await pool.query(query, [projectId, taskId]);
+      return result.rows[0];
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  },
+
+  editProjectField: async (id, updatedFields) => {
+    try {
+      // Convert ID to integer to ensure it's valid for PostgreSQL queries
+      const projectId = parseInt(id, 10);
+      if (isNaN(projectId)) {
+        throw new Error('Invalid project ID');
+      }
+
+      // Validate the updated fields to avoid updating with empty or invalid data
+      if (!updatedFields || typeof updatedFields !== 'object' || Object.keys(updatedFields).length === 0) {
+        throw new Error('Invalid updated fields');
+      }
+
+      // Create the query's set fields and values
+      const setFields = Object.keys(updatedFields)
+        .map((key, i) => `${key} = $${i + 1}`)
+        .join(', ');
+
+      const values = [...Object.values(updatedFields), projectId]; // Correct order of values
+
+      // Execute the query with parameterized inputs
+      const result = await pool.query(
+        `UPDATE projects SET ${setFields} WHERE id = $${values.length} RETURNING *`,
+        values,
+      );
+
+      if (result.rowCount === 0) { // No project found with the given ID
+        throw new Error('Project not found');
+      }
+
+      return result.rows[0]; // Return the updated project
+    } catch (error) {
+      console.error("Error in editProjectField:", error.message); // Log the error message
+      throw error; // Re-throw the error to handle it elsewhere
     }
   },
 };
