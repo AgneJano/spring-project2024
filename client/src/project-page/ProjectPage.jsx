@@ -57,6 +57,8 @@ const TaskColumnWrapper = styled.div`
   border-radius: 4px;
   padding: 10px;
   margin-right: 15px;
+  max-width: 385px;
+  width: 100%;
 `;
 
 const StatusBubble = styled.img`
