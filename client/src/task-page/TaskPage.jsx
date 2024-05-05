@@ -1,6 +1,5 @@
 import { Link, useParams } from "react-router-dom";
 import styled from "styled-components";
-import { useEffect, useState } from "react";
 import { getTaskIcons, getStatusSvgUrl } from "../mainFunctions";
 import editIcon from "../assets/icons/edit.svg";
 import deleteIcon from "../assets/icons/delete.svg";
@@ -8,7 +7,6 @@ import SyncLoader from "react-spinners/SyncLoader";
 import { useFetch } from "../fetching-data/UseFetch";
 
 const TaskPageWrapper = styled.div`
-  font-family: "Poppins", sans-serif;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -24,16 +22,14 @@ const DetailItem = styled.div`
   border-bottom: 1px solid #eee;
 
   h2 {
-    font-size: 16px;
+    font-size: 0.85rem;
     color: #818181;
-    font-family: "Poppins", sans-serif;
     margin-bottom: 0.5rem;
     font-weight: normal;
   }
 
   p {
-    font-size: 20px;
-    font-family: "Poppins", sans-serif;
+    font-size: 1.10rem;
     margin: 10px 0;
   }
 `;
@@ -91,7 +87,6 @@ const StatusandPriorityIcon = styled.img`
 
 const TaskStatusandPriority = styled.p`
   font-size: 20px;
-  font-family: "Poppins", sans-serif;
 `;
 
 const LoadingContainer = styled.div`
@@ -129,9 +124,6 @@ const TaskPage = () => {
 
   const task = tasksData.find((task) => task.id === Number(taskId));
 
-  const handleDelete = (taskId) => {
-    console.log("Deleting task with ID:", taskId);
-  };
   return (
     <>
       {task && (
@@ -152,53 +144,55 @@ const TaskPage = () => {
               </ImageContainer>
             </TaskActions>
           </TaskActionsContainer>
-
-          <TaskDetails>
-            <DetailItem>
-              <h2>Task ID:</h2>
-              <p>{task.id}</p>
-            </DetailItem>
-            <DetailItem>
-              <h2>Title:</h2>
-              <p>{task.name}</p>
-            </DetailItem>
-            <DetailItem>
-              <h2>Description:</h2>
-              <p>{task.description}</p>
-            </DetailItem>
-            <DetailItem>
-              <h2>Status:</h2>
-              <StatusandPriorityContainer>
-                <StatusandPriorityIcon
-                  src={getStatusSvgUrl(task?.status)}
-                  alt="Status Icon"
-                />
-                <TaskStatusandPriority>
-                  {getStatusDisplayText(task.status)}
-                </TaskStatusandPriority>
-              </StatusandPriorityContainer>
-            </DetailItem>
-            <DetailItem>
-              <h2>Priority:</h2>
-              <StatusandPriorityContainer>
-                <StatusandPriorityIcon
-                  src={getTaskIcons(task?.priority)}
-                  alt="Priority Icon"
-                />
-                <TaskStatusandPriority>
-                  {getPriorityDisplayText(task.priority)}
-                </TaskStatusandPriority>
-              </StatusandPriorityContainer>
-            </DetailItem>
-            <DetailItem>
-              <h2>Create date:</h2>
-              <p>{task.created_on.split("T")[0]}</p>
-            </DetailItem>
-            <DetailItem>
-              <h2>Edit date:</h2>
-              <p>{task.updated_on.split("T")[0]}</p>
-            </DetailItem>
-          </TaskDetails>
+          {task && (
+            <TaskDetails>
+              <DetailItem>
+                <h2>Title:</h2>
+                <p>{task.name}</p>
+              </DetailItem>
+              <DetailItem>
+                <h2>Task ID:</h2>
+                <p>{task.id}</p>
+              </DetailItem>
+              <DetailItem>
+                <h2>Description:</h2>
+                <p>{task.description}</p>
+              </DetailItem>
+              <DetailItem>
+                <h2>Status:</h2>
+                <StatusandPriorityContainer>
+                  <StatusandPriorityIcon
+                    src={getStatusSvgUrl(task?.status)}
+                    alt="Status Icon"
+                  />
+                  <TaskStatusandPriority>
+                    {getStatusDisplayText(task.status)}
+                  </TaskStatusandPriority>
+                </StatusandPriorityContainer>
+              </DetailItem>
+              <DetailItem>
+                <h2>Priority:</h2>
+                <StatusandPriorityContainer>
+                  <StatusandPriorityIcon
+                    src={getTaskIcons(task?.priority)}
+                    alt="Priority Icon"
+                  />
+                  <TaskStatusandPriority>
+                    {getPriorityDisplayText(task.priority)}
+                  </TaskStatusandPriority>
+                </StatusandPriorityContainer>
+              </DetailItem>
+              <DetailItem>
+                <h2>Create date:</h2>
+                <p>{task.created_on.split("T")[0]}</p>
+              </DetailItem>
+              <DetailItem>
+                <h2>Edit date:</h2>
+                <p>{task.updated_on.split("T")[0]}</p>
+              </DetailItem>
+            </TaskDetails>
+          )}
+          {!task && <p>Loading...</p>}
         </TaskPageWrapper>
       )}
       {tasksLoading && (

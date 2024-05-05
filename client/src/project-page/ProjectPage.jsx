@@ -14,7 +14,7 @@ import editIcon from "../assets/icons/edit.svg";
 const ProjectPageContainer = styled.div`
   max-width: 1180px;
   margin: 0 auto;
-  padding: 4.3rem 0 1.25rem;
+  padding: 4.3rem 1rem 1.25rem;
 `;
 
 const ButtonContainer = styled.div`

@@ -1,4 +1,4 @@
-import React, { useState, useContext, useMemo } from "react";
+import { useState, useContext, useMemo } from "react";
 import { ProjectCard } from "./ProjectCard";
 import { styled } from "styled-components";
 import { useFetch } from "../fetching-data/UseFetch";
