@@ -9,6 +9,7 @@ import { getStatusSvgUrl } from "../mainFunctions";
 import { useMemo, useState, useEffect } from "react";
 import { useFetch } from "../fetching-data/UseFetch";
 import { CSVLink } from "react-csv";
+import editIcon from "../assets/icons/edit.svg";
 
 const ProjectPageContainer = styled.div`
   max-width: 1180px;
@@ -102,19 +103,31 @@ const LoadingContainer = styled.div`
   height: 200px;
 `;
 
+const StyledIcon = styled.img`
+  width: 45px;
+  height: 45px;
+  &:hover {
+    filter: brightness(0.5);
+    transform: scale(0.9);
+  }
+`;
+
 function ProjectPage() {
   const { id } = useParams();
   const [tasksToDo, setTasksToDo] = useState([]);
   const [tasksInProgress, setTasksInProgress] = useState([]);
   const [tasksDone, setTasksDone] = useState([]);
-  const projects = JSON.parse(sessionStorage.getItem("projects"));
-  const projectData = projects.find((project) => project.id === parseInt(id));
-console.log('fetchinA')
-  const {
-    data: tasksData,
-    loading: tasksLoading,
-    refetch: refetchAllTasks,
-  } = useFetch(
+
+  const { data: projectsData, loading: projectsLoading } = useFetch(
+    `http://localhost:1000/api/v1/planpro/projects`,
+    "projects",
+  );
+
+  const projectData = projectsData.find(
+    (project) => project.id === parseInt(id),
+  );
+
+  const { data: tasksData, loading: tasksLoading } = useFetch(
     `http://localhost:1000/api/v1/planpro/projects/${id}/tasks`,
     `project-id${id}_tasks`,
   );
@@ -136,7 +149,6 @@ console.log('fetchinA')
   }, [tasksData]);
   const navigate = useNavigate();
 
-
   const url = getStatusSvgUrl(projectData?.status);
 
   const headers = [
@@ -148,7 +160,7 @@ console.log('fetchinA')
   ];
   return (
     <>
-      {tasksLoading ? (
+      {tasksLoading || projectsLoading ? (
         <LoadingContainer>
           <SyncLoader color={"#FFC107"} loading={tasksLoading} size={20} />
         </LoadingContainer>
@@ -174,6 +186,13 @@ console.log('fetchinA')
               <CSVLink data={tasksData} headers={headers} filename="tasks.csv">
                 <DownloadIcon src={downloadIcon} alt="Download" />
               </CSVLink>
+              <StyledIcon
+                src={editIcon}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate(`/projects/${id}/edit`);
+                }}
+              />
             </ButtonsContainer>
           </ButtonContainer>
           {tasksLoading ? (

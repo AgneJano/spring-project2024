@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
+import { useFetch } from "../fetching-data/UseFetch";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
+import SyncLoader from "react-spinners/SyncLoader";
 
 const RegistrationContainer = styled.div`
   display: flex;
@@ -67,6 +69,12 @@ const TextArea = styled.textarea`
     border-color: #000;
   }
 `;
+const LoadingContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+`;
 
 const SubmitButton = styled.button`
   width: 100%;
@@ -91,30 +99,25 @@ function EditProjectPage() {
   const navigate = useNavigate();
   const { id } = useParams();
   const [errors, setErrors] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     description: "",
   });
+  const { data: projectsData } = useFetch(
+    `http://localhost:1000/api/v1/planpro/projects`,
+    "projects",
+  );
 
   useEffect(() => {
-    if (id) {
-      const fetchProject = async () => {
-        try {
-          const response = await axios.get(
-            `http://localhost:1000/api/v1/planpro/projects/${id}`
-          );
-          setFormData({
-            name: response.data?.name || "",
-            description: response.data?.description || "",
-          });
-        } catch (error) {
-          console.error("Error fetching project:", error);
-        }
-      };
-
-      fetchProject();
+    const project = projectsData.find((project) => project.id === parseInt(id));
+    if (project) {
+      setFormData({
+        name: project.name || "",
+        description: project.description || "",
+      });
     }
-  }, [id]);
+  }, [projectsData, id]);
 
   const handleChange = (e) => {
     setFormData({
@@ -124,22 +127,26 @@ function EditProjectPage() {
   };
 
   const handleSubmit = async (e) => {
-    if (errors !== null) {
-      return;
-    }
     e.preventDefault();
-  
+    setLoading(true);
+
     try {
-      console.log(formData);
-      await axios.patch(
+      const response = await axios.patch(
         `http://localhost:1000/api/v1/planpro/projects/${id}`,
-        formData
+        formData,
       );
-  
+
+      const updatedProjects = projectsData.map((project) =>
+        project.id === parseInt(id) ? response.data : project,
+      );
+      sessionStorage.setItem("projects", JSON.stringify(updatedProjects));
+
       navigate(`/projects/${id}`);
     } catch (error) {
       setErrors(error);
       console.error("Error updating project:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -160,13 +167,17 @@ function EditProjectPage() {
             required
           />
           {formData.name && formData.name.length === 0 && (
-            <span style={{ color: 'red' }}>Name is required.</span>
+            <span style={{ color: "red" }}>Name is required.</span>
           )}
           {formData.name && formData.name.length < 2 && (
-            <span style={{ color: 'red' }}>Name must be at least 2 characters long.</span>
+            <span style={{ color: "red" }}>
+              Name must be at least 2 characters long.
+            </span>
           )}
           {formData.name && formData.name.length > 50 && (
-            <span style={{ color: 'red' }}>Name must be at most 50 characters long.</span>
+            <span style={{ color: "red" }}>
+              Name must be at most 50 characters long.
+            </span>
           )}
         </FormField>
         <FormField>
@@ -178,19 +189,29 @@ function EditProjectPage() {
             onChange={handleChange}
             minLength={2}
             maxLength={10000}
-            required 
+            required
           />
           {formData.description && formData.description.length === 0 && (
-            <span style={{ color: 'red' }}>Description is required.</span>
+            <span style={{ color: "red" }}>Description is required.</span>
           )}
           {formData.description && formData.description.length < 2 && (
-            <span style={{ color: 'red' }}>Description must be at least 2 characters long.</span>
+            <span style={{ color: "red" }}>
+              Description must be at least 2 characters long.
+            </span>
           )}
           {formData.description && formData.description.length === 10000 && (
-            <span style={{ color: 'red' }}>Description must be at most 10000 characters long.</span>
+            <span style={{ color: "red" }}>
+              Description must be at most 10000 characters long.
+            </span>
           )}
         </FormField>
-        <SubmitButton type="submit">Submit</SubmitButton>
+        {loading ? (
+          <LoadingContainer>
+            <SyncLoader color={"#FFC107"} loading={loading} size={20} />
+          </LoadingContainer>
+        ) : (
+          <SubmitButton type="submit">Submit</SubmitButton>
+        )}
       </StyledForm>
     </RegistrationContainer>
   );

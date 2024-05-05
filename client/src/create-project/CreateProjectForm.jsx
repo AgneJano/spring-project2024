@@ -124,16 +124,18 @@ const CreateProjectForm = () => {
     }
     e.preventDefault();
     try {
-      console.log(formData);
+
       const response = await axios.post(
         "http://localhost:1000/api/v1/planpro/projects",
         formData,
       );
 
       const newProject = response.data;
-      const updatedProjects =
+      const storedProjects =
         JSON.parse(sessionStorage.getItem("projects")) || [];
-      updatedProjects.push(newProject);
+
+      const updatedProjects = [...storedProjects, newProject];
+
       sessionStorage.setItem("projects", JSON.stringify(updatedProjects));
 
       navigate("/projects");

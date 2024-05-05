@@ -15,7 +15,7 @@ export const useFetch = (url, storageKey, onDataUpdate) => {
       console.error("Error fetching data:", error);
       setLoading(false);
     }
-  }, [url, storageKey]); // Dependency array includes url and storageKey
+  }, [url, storageKey]);
 
   useEffect(() => {
     const storedData = sessionStorage.getItem(storageKey);
@@ -25,7 +25,7 @@ export const useFetch = (url, storageKey, onDataUpdate) => {
     } else {
       fetchData();
     }
-  }, [fetchData, storageKey]); // Dependency array includes fetchData and storageKey
+  }, [fetchData, storageKey]);
 
   const refetch = () => {
     setLoading(true);
@@ -36,7 +36,7 @@ export const useFetch = (url, storageKey, onDataUpdate) => {
     if (typeof onDataUpdate === "function") {
       onDataUpdate(data);
     }
-  }, [data, onDataUpdate]); // Dependency array includes data and onDataUpdate
+  }, [data, onDataUpdate]);
 
   return { data, loading, refetch };
 };

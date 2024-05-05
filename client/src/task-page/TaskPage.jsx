@@ -1,12 +1,14 @@
-import { Link, useParams } from 'react-router-dom';
-import styled from 'styled-components';
-import { useEffect, useState } from 'react';
-import { getTaskIcons, getStatusSvgUrl } from '../mainFunctions';
-import editIcon from '../assets/icons/edit.svg';
-import deleteIcon from '../assets/icons/delete.svg';
+import { Link, useParams } from "react-router-dom";
+import styled from "styled-components";
+import { useEffect, useState } from "react";
+import { getTaskIcons, getStatusSvgUrl } from "../mainFunctions";
+import editIcon from "../assets/icons/edit.svg";
+import deleteIcon from "../assets/icons/delete.svg";
+import SyncLoader from "react-spinners/SyncLoader";
+import { useFetch } from "../fetching-data/UseFetch";
 
 const TaskPageWrapper = styled.div`
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -24,14 +26,14 @@ const DetailItem = styled.div`
   h2 {
     font-size: 16px;
     color: #818181;
-    font-family: 'Poppins', sans-serif;
+    font-family: "Poppins", sans-serif;
     margin-bottom: 0.5rem;
     font-weight: normal;
   }
 
   p {
     font-size: 20px;
-    font-family: 'Poppins', sans-serif;
+    font-family: "Poppins", sans-serif;
     margin: 10px 0;
   }
 `;
@@ -89,113 +91,122 @@ const StatusandPriorityIcon = styled.img`
 
 const TaskStatusandPriority = styled.p`
   font-size: 20px;
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
+`;
+
+const LoadingContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
 `;
 
 const TaskPage = () => {
   const { projectId, taskId } = useParams();
-  const [task, setTask] = useState(null);
 
   const getStatusDisplayText = (status) => {
     const statusMap = {
-      'to-do': 'To do',
-      'in-progress': 'In Progress',
-      'done': 'Done',
+      "to-do": "To do",
+      "in-progress": "In Progress",
+      done: "Done",
     };
     return statusMap[status] || status;
   };
 
   const getPriorityDisplayText = (priority) => {
     const priorityMap = {
-      'high': 'High',
-      'medium': 'Medium',
-      'low': 'Low',
+      high: "High",
+      medium: "Medium",
+      low: "Low",
     };
     return priorityMap[priority] || priority;
   };
 
-  //   const onDeleteClick = async (taskId) => {};
+  const { data: tasksData, loading: tasksLoading } = useFetch(
+    `http://localhost:1000/api/v1/planpro/projects`,
+    `project-id${projectId}_tasks`,
+  );
 
-  useEffect(() => {
-    const fetchTask = async () => {
-      try {
-        const response = await fetch(`http://localhost:1000/api/v1/planpro/projects/${projectId}/tasks/${taskId}`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch task');
-        }
-        const data = await response.json();
-        setTask(data);
-        console.log(data);
-      } catch (error) {
-        console.error('Error fetching task:', error);
-      }
-    };
+  const task = tasksData.find((task) => task.id === Number(taskId));
 
-    fetchTask();
-  }, [projectId, taskId]);
-
-  // const handleDelete = (taskId) => {
-  //   console.log('Deleting task with ID:', taskId);
-  // };
-
+  const handleDelete = (taskId) => {
+    console.log("Deleting task with ID:", taskId);
+  };
   return (
-    <TaskPageWrapper>
-      <TaskActionsContainer>
-        <TaskActions>
-          <ImageContainer>
-            <Link to={`/projects/${projectId}/tasks/${taskId}/edit`}>
-              <StyledIcon src={editIcon} />
-            </Link>
-            <StyledIcon
-              src={deleteIcon}
-              onClick={() => {
-                console.log('Icon clicked');
-                handleDelete(task?.id);
-              }}
-            />
-          </ImageContainer>
-        </TaskActions>
-      </TaskActionsContainer>
+    <>
       {task && (
-        <TaskDetails>
-          <DetailItem>
-            <h2>Task ID:</h2>
-            <p>{task.id}</p>
-          </DetailItem>
-          <DetailItem>
-            <h2>Title:</h2>
-            <p>{task.name}</p>
-          </DetailItem>
-          <DetailItem>
-            <h2>Description:</h2>
-            <p>{task.description}</p>
-          </DetailItem>
-          <DetailItem>
-            <h2>Status:</h2>
-            <StatusandPriorityContainer>
-              <StatusandPriorityIcon src={getStatusSvgUrl(task?.status)} alt="Status Icon" />
-              <TaskStatusandPriority>{getStatusDisplayText(task.status)}</TaskStatusandPriority>
-            </StatusandPriorityContainer>
-          </DetailItem>
-          <DetailItem>
-            <h2>Priority:</h2>
-            <StatusandPriorityContainer>
-              <StatusandPriorityIcon src={getTaskIcons(task?.priority)} alt="Priority Icon" />
-              <TaskStatusandPriority>{getPriorityDisplayText(task.priority)}</TaskStatusandPriority>
-            </StatusandPriorityContainer>
-          </DetailItem>
-          <DetailItem>
-  <h2>Create date:</h2>
-  <p>{task.created_on.split('T')[0]}</p>
-</DetailItem>
-<DetailItem>
-  <h2>Edit date:</h2>
-  <p>{task.updated_on.split('T')[0]}</p>
-</DetailItem>
-        </TaskDetails>
+        <TaskPageWrapper>
+          <TaskActionsContainer>
+            <TaskActions>
+              <ImageContainer>
+                <Link to={`/projects/${projectId}/tasks/${taskId}/edit`}>
+                  <StyledIcon src={editIcon} />
+                </Link>
+                <StyledIcon
+                  src={deleteIcon}
+                  onClick={() => {
+                    console.log("Icon clicked");
+                    handleDelete(task?.id);
+                  }}
+                />
+              </ImageContainer>
+            </TaskActions>
+          </TaskActionsContainer>
+
+          <TaskDetails>
+            <DetailItem>
+              <h2>Task ID:</h2>
+              <p>{task.id}</p>
+            </DetailItem>
+            <DetailItem>
+              <h2>Title:</h2>
+              <p>{task.name}</p>
+            </DetailItem>
+            <DetailItem>
+              <h2>Description:</h2>
+              <p>{task.description}</p>
+            </DetailItem>
+            <DetailItem>
+              <h2>Status:</h2>
+              <StatusandPriorityContainer>
+                <StatusandPriorityIcon
+                  src={getStatusSvgUrl(task?.status)}
+                  alt="Status Icon"
+                />
+                <TaskStatusandPriority>
+                  {getStatusDisplayText(task.status)}
+                </TaskStatusandPriority>
+              </StatusandPriorityContainer>
+            </DetailItem>
+            <DetailItem>
+              <h2>Priority:</h2>
+              <StatusandPriorityContainer>
+                <StatusandPriorityIcon
+                  src={getTaskIcons(task?.priority)}
+                  alt="Priority Icon"
+                />
+                <TaskStatusandPriority>
+                  {getPriorityDisplayText(task.priority)}
+                </TaskStatusandPriority>
+              </StatusandPriorityContainer>
+            </DetailItem>
+            <DetailItem>
+              <h2>Create date:</h2>
+              <p>{task.created_on.split("T")[0]}</p>
+            </DetailItem>
+            <DetailItem>
+              <h2>Edit date:</h2>
+              <p>{task.updated_on.split("T")[0]}</p>
+            </DetailItem>
+          </TaskDetails>
+        </TaskPageWrapper>
       )}
-      {!task && <p>Loading...</p>}
-    </TaskPageWrapper>
+      {tasksLoading && (
+        <LoadingContainer>
+          <SyncLoader color={"#FFC107"} loading={tasksLoading} size={20} />
+        </LoadingContainer>
+      )}
+    </>
   );
 };
 

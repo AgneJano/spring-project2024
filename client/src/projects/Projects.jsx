@@ -93,7 +93,6 @@ export const Projects = () => {
     refetch: refetchAllProjects,
   } = useFetch(`http://localhost:1000/api/v1/planpro/projects`, "projects");
 
-  // Apply filtering based on selected status
   const filteredProjectsData = useMemo(() => {
     if (selectedStatus) {
       return projectsData.filter(
@@ -103,7 +102,6 @@ export const Projects = () => {
     return projectsData;
   }, [projectsData, selectedStatus]);
 
-  // Paginate the filtered projects data
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentProjects = filteredProjectsData.slice(
@@ -113,7 +111,7 @@ export const Projects = () => {
 
   const handleFilterChange = (selectedStatus) => {
     setSelectedStatus(selectedStatus);
-    setCurrentPage(1); // Reset current page when applying filter
+    setCurrentPage(1);
   };
 
   const handlePaginate = (direction) => {
