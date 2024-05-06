@@ -1,4 +1,4 @@
-import { useState, useContext, useMemo, useEffect } from "react";
+import { useState, useContext, useMemo } from "react";
 import { ProjectCard } from "./ProjectCard";
 import { styled } from "styled-components";
 import { useFetch } from "../fetching-data/UseFetch";
@@ -20,9 +20,6 @@ const CardsContainer = styled.div`
   max-width: 77.5rem;
   margin: 1.875rem auto 0;
   justify-content: center;
-  @media (max-width: 48em) {
-    padding: 0 1rem;
-  }
 `;
 
 const Title = styled.p`
@@ -45,18 +42,12 @@ const ButtonsContainer = styled.div`
   gap: 0.625rem;
   max-width: 77.5rem;
   margin: 0 auto;
-  @media (max-width: 48em) {
-    flex-direction: column;
-    align-items: center;
-    padding: 0 1rem;
-  }
 `;
 
 const PaginationContainer = styled.div`
   display: flex;
   justify-content: center;
   margin-top: 2rem;
-  gap: 1rem;
 `;
 
 const PaginationButton = styled.button`
@@ -71,7 +62,7 @@ const PaginationButton = styled.button`
   border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.3s ease;
-  margin-top: 30px;
+  margin: 0 0.5rem;
 
   &:hover {
     background-color: #b38600;
@@ -95,51 +86,64 @@ export const Projects = () => {
   const [itemsPerPage] = useState(12);
   const [deleteModalItemId, setDeleteModalItemId] = useState(null);
   const [selectedStatus, setSelectedStatus] = useState("");
+
+  const {
+    data: projectsData,
+    loading: projectsLoading,
+    refetch: refetchAllProjects,
+  } = useFetch(`http://localhost:1000/api/v1/planpro/projects`, "projects");
+
+  const filteredProjectsData = useMemo(() => {
+    if (selectedStatus) {
+      return projectsData.filter(
+        (project) => project.status === selectedStatus,
+      );
+    }
+    return projectsData;
+  }, [projectsData, selectedStatus]);
+
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-
-  const { data, loading, refetch } = useFetch(
-    useMemo(
-      () =>
-        `http://localhost:1000/api/v1/planpro/projects${selectedStatus !== "" ? "?status=" + selectedStatus : ""}`,
-      [selectedStatus],
-    ),
+  const currentProjects = filteredProjectsData.slice(
+    indexOfFirstItem,
+    indexOfLastItem,
   );
-  const paginate = (pageNumber) => {
-    setCurrentPage(pageNumber);
-    refetch(
-      `http://localhost:1000/api/v1/planpro/projects?page=${pageNumber}&limit=${itemsPerPage}${selectedStatus !== "" ? "&status=" + selectedStatus : ""}`,
-    );
+
+  const handleFilterChange = (selectedStatus) => {
+    setSelectedStatus(selectedStatus);
+    setCurrentPage(1);
   };
 
-  useEffect(() => {
-    if (data.length < 12) {
-      setCurrentPage(1);
+  const handlePaginate = (direction) => {
+    if (direction === "prev" && currentPage > 1) {
+      setCurrentPage((prevPage) => prevPage - 1);
+    } else if (
+      direction === "next" &&
+      indexOfLastItem < filteredProjectsData.length
+    ) {
+      setCurrentPage((prevPage) => prevPage + 1);
     }
-  }, [data]);
+  };
 
-  const currentProjects = data?.slice(indexOfFirstItem, indexOfLastItem);
-
-  const deleteProject = async () => {
+  const deleteProject = async (projectId) => {
     try {
       await axios.delete(
-        `http://localhost:1000/api/v1/planpro/projects/${deleteModalItemId}`,
+        `http://localhost:1000/api/v1/planpro/projects/${projectId}`,
       );
-      refetch();
+      refetchAllProjects();
+      setCurrentPage(1);
     } catch (error) {
       console.error("Error deleting project:", error);
     }
   };
-  const handleFilterChange = (selectedStatus) => {
-    setSelectedStatus(selectedStatus);
-  };
+
   const headers = [
     { label: "Project ID", key: "id" },
     { label: "Project Name", key: "name" },
     { label: "Description", key: "description" },
     { label: "Status", key: "status" },
   ];
-  console.log(data);
+
   return (
     <>
       <Title>Projects</Title>
@@ -150,43 +154,41 @@ export const Projects = () => {
         />
         <Search />
         <Filter filterElement="projects" onFilterChange={handleFilterChange} />
-        <CSVLink data={data} headers={headers} filename="projects.csv">
+        <CSVLink
+          data={filteredProjectsData}
+          headers={headers}
+          filename="projects.csv"
+        >
           <DownloadIcon src={downloadIcon} alt="Download" />
         </CSVLink>
       </ButtonsContainer>
 
       <CardsContainer>
-        {loading ? (
+        {projectsLoading ? (
           <LoadingContainer>
-            <SyncLoader color={"#FFC107"} loading={loading} size={20} />
+            <SyncLoader color={"#FFC107"} loading={projectsLoading} size={20} />
           </LoadingContainer>
         ) : (
-          currentProjects?.map((project, i) => (
+          currentProjects.map((project) => (
             <ProjectCard
-              key={`projectCard${i}`}
+              key={`project-${project.id}`}
               {...project}
-              isVisibleDelete={user.role === "admin" ? true : false}
+              isVisibleDelete={user.role === "admin"}
               onDeleteModalOpen={() => setDeleteModalItemId(project.id)}
             />
           ))
         )}
       </CardsContainer>
 
-      {data.length > 12 && (
+      {filteredProjectsData.length > itemsPerPage && (
         <PaginationContainer>
           {currentPage !== 1 && (
-            <PaginationButton
-              onClick={() => paginate(currentPage - 1)}
-              disabled={currentPage === 1}
-            >
+            <PaginationButton onClick={() => handlePaginate("prev")}>
               Previous
             </PaginationButton>
           )}
-          {indexOfLastItem < data?.length && (
-            <PaginationButton
-              onClick={() => paginate(currentPage + 1)}
-              disabled={indexOfLastItem >= data?.record?.projects.length}
-            >
+          {!(indexOfLastItem >= filteredProjectsData.length) && (
+            <PaginationButton onClick={() => handlePaginate("next")}>
               Next
             </PaginationButton>
           )}
@@ -197,7 +199,10 @@ export const Projects = () => {
         <DeleteModal
           projectId={deleteModalItemId}
           onClose={() => setDeleteModalItemId(null)}
-          onDelete={() => deleteProject(deleteModalItemId)}
+          onDelete={() => {
+            deleteProject(deleteModalItemId);
+            setDeleteModalItemId(null);
+          }}
         />
       )}
     </>

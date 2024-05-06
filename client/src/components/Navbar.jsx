@@ -124,17 +124,11 @@ function Navbar() {
               <Icon to="/projects">
                 <img src={projects_icon} alt="Projects icon" />
               </Icon>
-              <Icon to="/tasks">
-                <img src={tasks_icon} alt="Tasks icon" />
-              </Icon>
               <DropdownMenu>
                 <Icon to="#" onClick={toggleMenu}>
                   <img src={account_icon} alt="Account icon" />
                 </Icon>
                 <DropdownContent isOpen={isMenuOpen}>
-                  <DropdownItem>
-                    <Link to="/profile">Profile</Link>
-                  </DropdownItem>
                   <DropdownItem onClick={handleLogout}>
                     <LogoutLink>Log out</LogoutLink>
                   </DropdownItem>

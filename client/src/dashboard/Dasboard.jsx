@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import { AuthContext } from "../utils/AuthContext";
-import styled from "styled-components";
-
+import { styled } from "styled-components";
+import { useFetch } from "../fetching-data/UseFetch";
 const DashboardContainer = styled.div`
   max-width: 800px;
   margin: 0 auto;
@@ -20,7 +20,7 @@ const UserInfo = styled.p`
 
 export const Dashboard = () => {
   const { user } = useContext(AuthContext);
-  console.log (user)
+  useFetch(`http://localhost:1000/api/v1/planpro/projects`, "projects");
 
   return (
     <DashboardContainer>

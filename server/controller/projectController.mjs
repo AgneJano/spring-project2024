@@ -62,7 +62,7 @@ const projectController = {
   },
   createTaskForProjectId: async (req, res) => {
     try {
-      const projectId = req.params.id; // Assuming project ID is passed in the URL parameters
+      const projectId = req.params.id;
       const project = await projectModel.getProjectsById(projectId);
 
       if (!project) {
@@ -83,9 +83,9 @@ const projectController = {
   getTasksByProjectsId: async (req, res) => {
     try {
       const projectId = req.params.id;
-      console.log("Project ID:", projectId); // Add logging here to check the project ID
+      console.log("Project ID:", projectId);
       const tasks = await projectModel.getTasksByProjectsId(projectId);
-      console.log("Tasks:", tasks); // Add logging here to check the tasks retrieved
+      console.log("Tasks:", tasks); 
       res.status(200).json(tasks);
     } catch (error) {
       console.error(error);
@@ -110,9 +110,7 @@ const projectController = {
 
   editProjectField: async (req, res) => {
     try {
-      // Iš request'o parametrų ištraukiame vartotojo ID
       const id = req.params.id;
-      // Iš request'o body ištraukiame laukus, kuriuos norime atnaujinti
       const updatedFields = req.body;
 
       const project = await projectModel.editProjectField(id, updatedFields);
