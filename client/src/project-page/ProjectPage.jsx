@@ -155,20 +155,7 @@ function ProjectPage() {
     "projects",
   );
 
-  const filteredProjectsData = useMemo(() => {
-    let filteredData = projectsData;
-    if (searchQuery) {
-      const searchLower = searchQuery.toLowerCase();
-      filteredData = filteredData.filter(
-        (project) =>
-          project.name.toLowerCase().includes(searchLower) ||
-          project.description.toLowerCase().includes(searchLower),
-      );
-    }
-    return filteredData;
-  }, [projectsData, searchQuery]);
-
-  const projectData = filteredProjectsData.find(
+  const projectData = projectsData.find(
     (project) => project.id === parseInt(id),
   );
 
@@ -187,7 +174,7 @@ function ProjectPage() {
   };
   return (
     <>
-      {tasksLoading || projectsLoading ? (
+      {projectsLoading ? (
         <LoadingContainer>
           <SyncLoader color={"#FFC107"} loading={tasksLoading} size={20} />
         </LoadingContainer>
@@ -222,21 +209,33 @@ function ProjectPage() {
               />
             </ButtonsContainer>
           </ButtonContainer>
-          <ColumnsContainer>
-            <TaskColumnWrapper>
-              <TaskColumn title="To Do" tasks={tasksToDo} mainStatus="to-do" />
-            </TaskColumnWrapper>
-            <TaskColumnWrapper>
-              <TaskColumn
-                title="In progress"
-                tasks={tasksInProgress}
-                mainStatus="in-progress"
-              />
-            </TaskColumnWrapper>
-            <TaskColumnWrapper>
-              <TaskColumn title="Done" tasks={tasksDone} mainStatus="done" />
-            </TaskColumnWrapper>
-          </ColumnsContainer>
+          {tasksLoading ? (
+            <LoadingContainer>
+              <SyncLoader color={"#FFC107"} loading={tasksLoading} size={20} />
+            </LoadingContainer>
+          ) : (
+            <ColumnsContainer>
+              <TaskColumnWrapper>
+                <TaskColumn
+                  title="To Do"
+                  tasks={tasksToDo}
+                  mainStatus="to-do"
+                />
+              </TaskColumnWrapper>
+
+              <TaskColumnWrapper>
+                <TaskColumn
+                  title="In progress"
+                  tasks={tasksInProgress}
+                  mainStatus="in-progress"
+                />
+              </TaskColumnWrapper>
+
+              <TaskColumnWrapper>
+                <TaskColumn title="Done" tasks={tasksDone} mainStatus="done" />
+              </TaskColumnWrapper>
+            </ColumnsContainer>
+          )}
         </ProjectPageContainer>
       )}
     </>
