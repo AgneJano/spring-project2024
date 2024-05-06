@@ -116,26 +116,25 @@ const StyledIcon = styled.img`
 
 function ProjectPage() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [tasksToDo, setTasksToDo] = useState([]);
   const [tasksInProgress, setTasksInProgress] = useState([]);
   const [tasksDone, setTasksDone] = useState([]);
-
-  const { data: projectsData, loading: projectsLoading } = useFetch(
-    `http://localhost:1000/api/v1/planpro/projects`,
-    "projects",
-  );
-
-  const projectData = projectsData.find(
-    (project) => project.id === parseInt(id),
-  );
-
+  const [searchQuery, setSearchQuery] = useState("");
   const { data: tasksData, loading: tasksLoading } = useFetch(
     `http://localhost:1000/api/v1/planpro/projects/${id}/tasks`,
     `project-id${id}_tasks`,
   );
+
   useEffect(() => {
     if (tasksData) {
-      const filteredTasks = tasksData.reduce(
+      const filteredTasks = tasksData.filter(
+        (task) =>
+          task.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          task.description.toLowerCase().includes(searchQuery.toLowerCase()),
+      );
+
+      const filteredTasksByStatus = filteredTasks.reduce(
         (acc, task) => {
           if (task.status === "to-do") acc.toDo.push(task);
           else if (task.status === "in-progress") acc.inProgress.push(task);
@@ -144,12 +143,34 @@ function ProjectPage() {
         },
         { toDo: [], inProgress: [], done: [] },
       );
-      setTasksToDo(filteredTasks.toDo);
-      setTasksInProgress(filteredTasks.inProgress);
-      setTasksDone(filteredTasks.done);
+
+      setTasksToDo(filteredTasksByStatus.toDo);
+      setTasksInProgress(filteredTasksByStatus.inProgress);
+      setTasksDone(filteredTasksByStatus.done);
     }
-  }, [tasksData]);
-  const navigate = useNavigate();
+  }, [tasksData, searchQuery]);
+
+  const { data: projectsData, loading: projectsLoading } = useFetch(
+    `http://localhost:1000/api/v1/planpro/projects`,
+    "projects",
+  );
+
+  const filteredProjectsData = useMemo(() => {
+    let filteredData = projectsData;
+    if (searchQuery) {
+      const searchLower = searchQuery.toLowerCase();
+      filteredData = filteredData.filter(
+        (project) =>
+          project.name.toLowerCase().includes(searchLower) ||
+          project.description.toLowerCase().includes(searchLower),
+      );
+    }
+    return filteredData;
+  }, [projectsData, searchQuery]);
+
+  const projectData = filteredProjectsData.find(
+    (project) => project.id === parseInt(id),
+  );
 
   const url = getStatusSvgUrl(projectData?.status);
 
@@ -160,6 +181,10 @@ function ProjectPage() {
     { label: "Priority", key: "priority" },
     { label: "Status", key: "status" },
   ];
+
+  const handleSearch = (query) => {
+    setSearchQuery(query);
+  };
   return (
     <>
       {tasksLoading || projectsLoading ? (
@@ -184,7 +209,7 @@ function ProjectPage() {
                 buttonTitle="Add task"
                 onClick={() => navigate(`/projects/${id}/create-task`)}
               />
-              <Search />
+              <Search onSearch={handleSearch} />
               <CSVLink data={tasksData} headers={headers} filename="tasks.csv">
                 <DownloadIcon src={downloadIcon} alt="Download" />
               </CSVLink>
@@ -197,41 +222,21 @@ function ProjectPage() {
               />
             </ButtonsContainer>
           </ButtonContainer>
-          {tasksLoading ? (
-            <LoadingContainer>
-              <SyncLoader color={"#FFC107"} loading={tasksLoading} size={20} />
-            </LoadingContainer>
-          ) : (
-            <ColumnsContainer>
-              {tasksToDo.length !== 0 && (
-                <TaskColumnWrapper>
-                  <TaskColumn
-                    title="To Do"
-                    tasks={tasksToDo}
-                    mainStatus="to-do"
-                  />
-                </TaskColumnWrapper>
-              )}
-              {tasksInProgress.length !== 0 && (
-                <TaskColumnWrapper>
-                  <TaskColumn
-                    title="In progress"
-                    tasks={tasksInProgress}
-                    mainStatus="in-progress"
-                  />
-                </TaskColumnWrapper>
-              )}
-              {tasksDone.length !== 0 && (
-                <TaskColumnWrapper>
-                  <TaskColumn
-                    title="Done"
-                    tasks={tasksDone}
-                    mainStatus="done"
-                  />
-                </TaskColumnWrapper>
-              )}
-            </ColumnsContainer>
-          )}
+          <ColumnsContainer>
+            <TaskColumnWrapper>
+              <TaskColumn title="To Do" tasks={tasksToDo} mainStatus="to-do" />
+            </TaskColumnWrapper>
+            <TaskColumnWrapper>
+              <TaskColumn
+                title="In progress"
+                tasks={tasksInProgress}
+                mainStatus="in-progress"
+              />
+            </TaskColumnWrapper>
+            <TaskColumnWrapper>
+              <TaskColumn title="Done" tasks={tasksDone} mainStatus="done" />
+            </TaskColumnWrapper>
+          </ColumnsContainer>
         </ProjectPageContainer>
       )}
     </>
