@@ -1,6 +1,5 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { styled } from "styled-components";
-import { useParams } from "react-router-dom";
 import SyncLoader from "react-spinners/SyncLoader";
 import TaskColumn from "../components/TaskColumn";
 import downloadIcon from "../assets/download.svg";
@@ -10,11 +9,12 @@ import { getStatusSvgUrl } from "../mainFunctions";
 import { useMemo, useState, useEffect } from "react";
 import { useFetch } from "../fetching-data/UseFetch";
 import { CSVLink } from "react-csv";
+import editIcon from "../assets/icons/edit.svg";
 
 const ProjectPageContainer = styled.div`
   max-width: 1180px;
   margin: 0 auto;
-  padding: 4.3rem 0 1.25rem;
+  padding: 4.3rem 1rem 1.25rem;
 `;
 
 const ButtonContainer = styled.div`
@@ -57,6 +57,8 @@ const TaskColumnWrapper = styled.div`
   border-radius: 4px;
   padding: 10px;
   margin-right: 15px;
+  max-width: 385px;
+  width: 100%;
 `;
 
 const StatusBubble = styled.img`
@@ -103,27 +105,36 @@ const LoadingContainer = styled.div`
   height: 200px;
 `;
 
+const StyledIcon = styled.img`
+  width: 45px;
+  height: 45px;
+  &:hover {
+    filter: brightness(0.5);
+    transform: scale(0.9);
+  }
+`;
+
 function ProjectPage() {
   const { id } = useParams();
-
-  const { data: projectData, loading: projectLoading } = useFetch(
-    useMemo(() => `http://localhost:1000/api/v1/planpro/projects/${id}`, [id]),
-  );
-  const { data: tasksData, loading: tasksLoading } = useFetch(
-    useMemo(
-      () => `http://localhost:1000/api/v1/planpro/projects/${id}/tasks`,
-      [id],
-    ),
-  );
-  console.log(tasksData);
-  const navigate = useNavigate();
-
   const [tasksToDo, setTasksToDo] = useState([]);
   const [tasksInProgress, setTasksInProgress] = useState([]);
   const [tasksDone, setTasksDone] = useState([]);
 
+  const { data: projectsData, loading: projectsLoading } = useFetch(
+    `http://localhost:1000/api/v1/planpro/projects`,
+    "projects",
+  );
+
+  const projectData = projectsData.find(
+    (project) => project.id === parseInt(id),
+  );
+
+  const { data: tasksData, loading: tasksLoading } = useFetch(
+    `http://localhost:1000/api/v1/planpro/projects/${id}/tasks`,
+    `project-id${id}_tasks`,
+  );
   useEffect(() => {
-    if (projectData && tasksData) {
+    if (tasksData) {
       const filteredTasks = tasksData.reduce(
         (acc, task) => {
           if (task.status === "to-do") acc.toDo.push(task);
@@ -133,12 +144,12 @@ function ProjectPage() {
         },
         { toDo: [], inProgress: [], done: [] },
       );
-
       setTasksToDo(filteredTasks.toDo);
       setTasksInProgress(filteredTasks.inProgress);
       setTasksDone(filteredTasks.done);
     }
-  }, [projectData, tasksData]);
+  }, [tasksData]);
+  const navigate = useNavigate();
 
   const url = getStatusSvgUrl(projectData?.status);
 
@@ -151,13 +162,9 @@ function ProjectPage() {
   ];
   return (
     <>
-      {projectLoading || tasksLoading ? (
+      {tasksLoading || projectsLoading ? (
         <LoadingContainer>
-          <SyncLoader
-            color={"#FFC107"}
-            loading={projectLoading || tasksLoading}
-            size={20}
-          />
+          <SyncLoader color={"#FFC107"} loading={tasksLoading} size={20} />
         </LoadingContainer>
       ) : (
         <ProjectPageContainer>
@@ -181,11 +188,18 @@ function ProjectPage() {
               <CSVLink data={tasksData} headers={headers} filename="tasks.csv">
                 <DownloadIcon src={downloadIcon} alt="Download" />
               </CSVLink>
+              <StyledIcon
+                src={editIcon}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate(`/projects/${id}/edit`);
+                }}
+              />
             </ButtonsContainer>
           </ButtonContainer>
           {tasksLoading ? (
             <LoadingContainer>
-              <SyncLoader color={"#FFC107"} loading={loading} size={20} />
+              <SyncLoader color={"#FFC107"} loading={tasksLoading} size={20} />
             </LoadingContainer>
           ) : (
             <ColumnsContainer>

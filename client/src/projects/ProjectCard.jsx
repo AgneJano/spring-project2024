@@ -124,7 +124,6 @@ export const ProjectCard = ({
             Tasks left: {tasksLeft}/{tasks}
           </TaskInfo>
           <ImageContainer>
-            {/* TO DO: funkcionalas */}
             <StyledIcon
               src={editIcon}
               onClick={(e) => {

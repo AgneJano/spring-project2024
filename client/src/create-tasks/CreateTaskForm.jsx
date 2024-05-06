@@ -2,6 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
 import styled from "styled-components";
+import SyncLoader from "react-spinners/SyncLoader";
 
 const RegistrationContainer = styled.div`
   display: flex;
@@ -103,9 +104,16 @@ const SubmitButton = styled.button`
     background-color: #b38600;
   }
 `;
+const LoadingContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+`;
 const CreateTaskForm = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -124,16 +132,33 @@ const CreateTaskForm = () => {
   };
 
   const handleSubmit = async (e) => {
+    setLoading(true);
     e.preventDefault();
     try {
-      await axios.post(
+      const response = await axios.post(
         `http://localhost:1000/api/v1/planpro/projects/${id}/tasks`,
-        { ...formData, priority } // Pass priority in the request
+        { ...formData, priority },
       );
 
+      const newTask = response.data;
+
+      const storedTasks = sessionStorage.getItem(`project-id${id}_tasks`);
+      let tasks = [];
+
+      if (storedTasks) {
+        tasks = JSON.parse(storedTasks);
+      }
+
+      tasks.push(newTask);
+
+      const updatedTasksData = JSON.stringify(tasks);
+
+      sessionStorage.setItem(`project-id${id}_tasks`, updatedTasksData);
       navigate(`/projects/${id}`);
     } catch (error) {
       console.error("Error creating project:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -154,13 +179,17 @@ const CreateTaskForm = () => {
             required
           />
           {formData.name && formData.name.length === 0 && (
-            <span style={{ color: 'red' }}>Name is required.</span>
+            <span style={{ color: "red" }}>Name is required.</span>
           )}
           {formData.name && formData.name.length < 2 && (
-            <span style={{ color: 'red' }}>Name must be at least 2 characters long.</span>
+            <span style={{ color: "red" }}>
+              Name must be at least 2 characters long.
+            </span>
           )}
           {formData.name && formData.name.length > 50 && (
-            <span style={{ color: 'red' }}>Name must be at most 50 characters long.</span>
+            <span style={{ color: "red" }}>
+              Name must be at most 50 characters long.
+            </span>
           )}
         </FormField>
         <FormField>
@@ -175,15 +204,18 @@ const CreateTaskForm = () => {
             required
           />
           {formData.description && formData.description.length === 0 && (
-            <span style={{ color: 'red' }}>Description is required.</span>
+            <span style={{ color: "red" }}>Description is required.</span>
           )}
           {formData.description && formData.description.length < 2 && (
-            <span style={{ color: 'red' }}>Description must be at least 2 characters long.</span>
+            <span style={{ color: "red" }}>
+              Description must be at least 2 characters long.
+            </span>
           )}
           {formData.description && formData.description.length === 10000 && (
-            <span style={{ color: 'red' }}>Description must be at most 10000 characters long.</span>
+            <span style={{ color: "red" }}>
+              Description must be at most 10000 characters long.
+            </span>
           )}
-
         </FormField>
         <FormField>
           <Label htmlFor="priority">Priority:</Label>
@@ -198,7 +230,13 @@ const CreateTaskForm = () => {
             <option value="high">High</option>
           </PrioritySelect>
         </FormField>
-        <SubmitButton type="submit">Submit</SubmitButton>
+        {loading ? (
+          <LoadingContainer>
+            <SyncLoader color={"#FFC107"} loading={loading} size={20} />
+          </LoadingContainer>
+        ) : (
+          <SubmitButton type="submit">Submit</SubmitButton>
+        )}
       </StyledForm>
     </RegistrationContainer>
   );

@@ -14,6 +14,7 @@ import TaskPage from "./task-page/TaskPage";
 import LogPage from "./logs/LogPage";
 
 import EditProjectPage from "./edit-project-page/EditProjectPage";
+import EditTaskPage from "./edit-task-page/EditTaskPage";
 
 function App() {
   const { isAuthenticated } = useContext(AuthContext);
@@ -36,8 +37,9 @@ function App() {
             <Route path="/projects/:id/create-task" element={<CreateTaskForm />} />
             <Route path="/logs" element={<LogPage/>} />
             <Route path="/projects/:projectId/tasks/:taskId" element={<TaskPage />} />
-            <Route path="/tasks/:id" element={<TaskPage />} />
+            {/* <Route path="/tasks/:id" element={<TaskPage />} /> */}
             <Route path="/projects/:id/edit" element={<EditProjectPage />} />
+            <Route path="/projects/:projectId/tasks/:taskId/edit" element={<EditTaskPage />} />
           </>
         ) : (
           <>

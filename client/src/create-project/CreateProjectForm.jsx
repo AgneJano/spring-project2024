@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import SyncLoader from "react-spinners/SyncLoader";
+import { useFetch } from "../fetching-data/UseFetch";
 
 const RegistrationContainer = styled.div`
   display: flex;
@@ -123,16 +124,26 @@ const CreateProjectForm = () => {
     }
     e.preventDefault();
     try {
-      console.log(formData);
-      await axios.post(
+
+      const response = await axios.post(
         "http://localhost:1000/api/v1/planpro/projects",
         formData,
       );
+
+      const newProject = response.data;
+      const storedProjects =
+        JSON.parse(sessionStorage.getItem("projects")) || [];
+
+      const updatedProjects = [...storedProjects, newProject];
+
+      sessionStorage.setItem("projects", JSON.stringify(updatedProjects));
 
       navigate("/projects");
     } catch (error) {
       setErrors(error);
       console.error("Error creating project:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
