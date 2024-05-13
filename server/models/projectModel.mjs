@@ -148,6 +148,34 @@ const projectModel = {
     }
   },
 
+
+  getAllTasksCount: async () => {
+    try {
+      const query = `
+        SELECT 
+          COUNT(*) AS total_tasks,
+          SUM(CASE WHEN status = 'to-do' THEN 1 ELSE 0 END) AS to_do,
+          SUM(CASE WHEN status = 'in-progress' THEN 1 ELSE 0 END) AS in_progress,
+          SUM(CASE WHEN status = 'done' THEN 1 ELSE 0 END) AS done,
+          SUM(CASE WHEN priority = 'high' THEN 1 ELSE 0 END) AS high_priority,
+          SUM(CASE WHEN priority = 'medium' THEN 1 ELSE 0 END) AS medium_priority,
+          SUM(CASE WHEN priority = 'low' THEN 1 ELSE 0 END) AS low_priority
+        FROM tasks;
+      `;
+      const result = await pool.query(query);
+      return result.rows[0];
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  },
+
+
+
+
+
+
+
   editProjectField: async (id, updatedFields) => {
     try {
       // Convert ID to integer to ensure it's valid for PostgreSQL queries

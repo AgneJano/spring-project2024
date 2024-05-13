@@ -17,6 +17,7 @@ router.post(
 );
 router.get("/:id/tasks", projectController.getTasksByProjectsId);
 router.get("/:projectId/tasks/:taskId", projectController.getTaskById);
+router.get("/tasks/count", projectController.getAllTasksCount);
 router.delete("/:id", projectController.deleteProject);
 router.post(
   "/",

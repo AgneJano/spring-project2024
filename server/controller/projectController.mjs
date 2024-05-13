@@ -68,7 +68,7 @@ const projectController = {
       if (!project) {
         return res.status(404).json({ message: "Project not found" });
       }
-
+      
       const taskData = { ...req.body, project_id: projectId };
       const task = await projectModel.createTaskForProjectId(taskData);
 
@@ -107,6 +107,21 @@ const projectController = {
       res.status(500).json({ message: "Internal server error" });
     }
   },
+
+
+
+
+  getAllTasksCount: async (req, res) => {
+    try {
+      const tasksCount = await projectModel.getAllTasksCount();
+      res.status(200).json(tasksCount);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  },
+
+
 
   editProjectField: async (req, res) => {
     try {
