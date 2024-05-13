@@ -86,6 +86,7 @@ export const Projects = () => {
   const [itemsPerPage] = useState(12);
   const [deleteModalItemId, setDeleteModalItemId] = useState(null);
   const [selectedStatus, setSelectedStatus] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
 
   const {
     data: projectsData,
@@ -94,13 +95,24 @@ export const Projects = () => {
   } = useFetch(`http://localhost:1000/api/v1/planpro/projects`, "projects");
 
   const filteredProjectsData = useMemo(() => {
+    let filteredData = projectsData;
     if (selectedStatus) {
-      return projectsData.filter(
+      filteredData = filteredData.filter(
         (project) => project.status === selectedStatus,
       );
     }
-    return projectsData;
-  }, [projectsData, selectedStatus]);
+
+    if (searchQuery) {
+      const searchLower = searchQuery.toLowerCase();
+      filteredData = filteredData.filter(
+        (project) =>
+          project.name.toLowerCase().includes(searchLower) ||
+          project.description.toLowerCase().includes(searchLower),
+      );
+    }
+
+    return filteredData;
+  }, [projectsData, selectedStatus, searchQuery]);
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -152,7 +164,7 @@ export const Projects = () => {
           buttonTitle="Add project"
           onClick={() => navigate("/create-project")}
         />
-        <Search />
+        <Search onSearch={setSearchQuery} />
         <Filter filterElement="projects" onFilterChange={handleFilterChange} />
         <CSVLink
           data={filteredProjectsData}
