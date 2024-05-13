@@ -120,7 +120,9 @@ function ProjectPage() {
   const [tasksToDo, setTasksToDo] = useState([]);
   const [tasksInProgress, setTasksInProgress] = useState([]);
   const [tasksDone, setTasksDone] = useState([]);
+
   const [searchQuery, setSearchQuery] = useState("");
+
   const { data: tasksData, loading: tasksLoading } = useFetch(
     `http://localhost:1000/api/v1/planpro/projects/${id}/tasks`,
     `project-id${id}_tasks`,
