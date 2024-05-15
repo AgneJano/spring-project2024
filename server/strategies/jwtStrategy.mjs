@@ -10,21 +10,23 @@ const opts = {
 };
 
 const createJwtStrategy = async () => {
-  const jwtStrategy = new JwtStrategy(opts, async (jwt_payload, done) => {
-    try {
-      const user = await userModel.getUserById(jwt_payload.id);
-      console.log(jwt_payload);
-      if (user) {
-        return done(null, user);
+  try {
+    const jwtStrategy = new JwtStrategy(opts, async (jwt_payload, done) => {
+      try {
+        const user = await userModel.getUserById(jwt_payload.id);
+        if (user) {
+          return done(null, user);
+        } else {
+          return done(null, false); // User not found
+        }
+      } catch (error) {
+        return done(error, false); // Error during user retrieval
       }
-
-      return done(null, user);
-    } catch (error) {
-      return done(null, false);
-    }
-  });
-
-  return jwtStrategy;
+    });
+    return jwtStrategy;
+  } catch (error) {
+    throw new Error("Failed to create JWT strategy");
+  }
 };
 
 export default createJwtStrategy;

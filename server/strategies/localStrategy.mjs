@@ -4,18 +4,12 @@ import userModel from "../models/userModel.mjs";
 
 const localStrategy = new LocalStrategy(
   {
-    usernameField: "login", 
+    usernameField: "login",
     passwordField: "password",
   },
   async (login, password, done) => {
-    
     try {
-      const user = await userModel.login({ email:login }); 
-
-      if (!user) {
-        // If user is not found
-        return done(null, false, { message: "User not found" });
-      }
+      const user = await userModel.login({ email: login });
 
       const match = await bcrypt.compare(password, user.password);
 
@@ -25,7 +19,9 @@ const localStrategy = new LocalStrategy(
 
       return done(null, user);
     } catch (error) {
-      return done(error);
+      if (error.message === "User not found") {
+        return done(null, false, { message: error.message });
+      }
     }
   }
 );

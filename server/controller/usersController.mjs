@@ -1,17 +1,8 @@
 import userModel from "../models/userModel.mjs";
 import bcrypt from "bcrypt";
+import { MongoClient } from "mongodb";
 
 const userController = {
-  //     getUsers: async (req, res) => {
-  //         try {
-  //             const users = await userModel.getUsers();
-  //             res.status(200).json(users);
-  //         } catch (err) {
-  //             console.error(err);
-  //             res.status(500).json({ message: 'An error occurred while fetching users.' });
-  //         }
-  //     },
-
   createUser: async (req, res) => {
     try {
       const { name, email, password, repeatPassword, role = "user" } = req.body;
@@ -55,7 +46,6 @@ const userController = {
       const { email } = req.body;
 
       const user = await userModel.login({ email });
-
       res.status(200).json({ message: "User Logged in successfully", user });
     } catch (error) {
       if (
@@ -70,7 +60,23 @@ const userController = {
           .json({ message: "An error occurred while logging in." });
       }
     }
-  }
+  },
+
+  adminLogs: async (req, res) => {
+    try {
+      const client = new MongoClient(
+        process.env.MONGODB
+      );
+      await client.connect();
+      const logsCollection = client.db().collection("logs");
+      const logs = await logsCollection.find().toArray();
+      res.json(logs);
+      await client.close();
+    } catch (err) {
+      console.error(err);
+      res.status(500).send("Server error");
+    }
+  },
 };
 
 export default userController;

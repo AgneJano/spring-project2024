@@ -117,41 +117,41 @@ function LoginForm() {
       }
     }
   };
-return (
-  <Container>
-    <Form onSubmit={handleSubmit(onSubmit)}>
-      <FormGroup>
-        <Label>Email address</Label>
-        <Input
-          type="text"
-          name="login"
-          autoComplete="username"
-          {...register("login", { required: "Email is required" })}
-        />
-        {errors.login && <ErrorMessage>{errors.login.message}</ErrorMessage>}
-      </FormGroup>
+  return (
+    <Container>
+      <Form onSubmit={handleSubmit(onSubmit)}>
+        <FormGroup>
+          <Label>Email address</Label>
+          <Input
+            type="text"
+            name="login"
+            autoComplete="username"
+            {...register("login", { required: "Email is required" })}
+          />
+          {errors.login && <ErrorMessage>{errors.login.message}</ErrorMessage>}
+        </FormGroup>
 
-      <FormGroup>
-        <Label>Password</Label>
-        <Input
-          type="password"
-          name="password"
-          autoComplete="current-password"
-          {...register("password", { required: "Password is required" })}
-        />
-        {errors.password && (
-          <ErrorMessage>{errors.password.message}</ErrorMessage>
-        )}
-      </FormGroup>
-      {serverError && <ErrorMessage>{serverError}</ErrorMessage>}
-      <Button type="submit">SIGN IN</Button>
-      <SignUpLink>
-        Don&apos;t have an account?{" "}
-        <SignLink to="/registration">Sign up</SignLink>
-      </SignUpLink>
-    </Form>
-  </Container>
-);
+        <FormGroup>
+          <Label>Password</Label>
+          <Input
+            type="password"
+            name="password"
+            autoComplete="current-password"
+            {...register("password", { required: "Password is required" })}
+          />
+          {errors.password && (
+            <ErrorMessage>{errors.password.message}</ErrorMessage>
+          )}
+        </FormGroup>
+        {serverError && <ErrorMessage>{serverError}</ErrorMessage>}
+        <Button type="submit">SIGN IN</Button>
+        <SignUpLink>
+          Don&apos;t have an account?{" "}
+          <SignLink to="/registration">Sign up</SignLink>
+        </SignUpLink>
+      </Form>
+    </Container>
+  );
 }
 
 export default LoginForm;
