@@ -113,11 +113,13 @@ const projectModel = {
         description,
         status = "to-do",
         priority = "medium",
+        created_on = new Date(),
+        updated_on = new Date(),
       } = taskData;
 
       const result = await pool.query(
-        "INSERT INTO tasks (project_id, name, description, status, priority) VALUES ($1, $2, $3, $4, $5) RETURNING *",
-        [project_id, name, description, status, priority]
+        "INSERT INTO tasks (project_id, name, description, status, priority, created_on, updated_on) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *",
+        [project_id, name, description, status, priority, created_on, updated_on]
       );
 
       return result.rows[0];
@@ -212,6 +214,55 @@ const projectModel = {
       throw error; // Re-throw the error to handle it elsewhere
     }
   },
-};
+  editTaskFields: async (id, updatedFields) => {
+    try {
+      const taskId = parseInt(id, 10);
+      if (isNaN(taskId)) {
+        throw new Error('Invalid task ID.');
+      }
+  
+      const updatedTime = new Date(); // Get the current date and time
+  
+      const updatedFieldsWithNewTime= {
+        ...updatedFields,
+        updated_on: updatedTime,
+      };
+  
+      // Create the SET clause dynamically
+      const setFields = Object.keys(updatedFieldsWithNewTime)
+        .map((key, i) => `${key} = $${i + 1}`) // Use indexed placeholders
+        .join(', ');
+  
+      // Prepare the values for the query
+      const values = Object.values(updatedFieldsWithNewTime);
+      values.push(taskId); // Append the ID as the last parameter
+  
+      // Execute the SQL query with the dynamic SET clause
+      const result = await pool.query(
+        `UPDATE tasks SET ${setFields} WHERE id = $${values.length} RETURNING *`,
+        values
+      );
+  
+      if (result.rows.length === 0) {
+        throw new Error(`Task with ID ${taskId} not found.`);
+      }
+  
+      return result.rows[0]; // Return the updated task
+    } catch (error) {
+      console.error('Error updating task:', error);
+      throw error; // Propagate the error
+    }
+  },
+  deleteTask: async (id) => {
+    try {
+      const query = "DELETE FROM tasks WHERE id = $1";
+      const result = await pool.query(query, [id]);
+      return result.rows;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  },
+}
 
 export default projectModel;

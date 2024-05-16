@@ -10,6 +10,8 @@ import { useMemo, useState, useEffect } from "react";
 import { useFetch } from "../fetching-data/UseFetch";
 import { CSVLink } from "react-csv";
 import editIcon from "../assets/icons/edit.svg";
+import { DeleteModal } from "../components/DeleteModal";
+import axios from "axios";
 
 const ProjectPageContainer = styled.div`
   max-width: 1180px;
@@ -119,15 +121,16 @@ function ProjectPage() {
   const navigate = useNavigate();
   const [tasksToDo, setTasksToDo] = useState([]);
   const [tasksInProgress, setTasksInProgress] = useState([]);
+  const [deleteModalItemId, setDeleteModalItemId] = useState(null);
   const [tasksDone, setTasksDone] = useState([]);
 
   const [searchQuery, setSearchQuery] = useState("");
 
-  const { data: tasksData, loading: tasksLoading } = useFetch(
+  const { data: tasksData, loading: tasksLoading, refetch: refetchAllProjects } = useFetch(
     `http://localhost:1000/api/v1/planpro/projects/${id}/tasks`,
     `project-id${id}_tasks`,
   );
-
+  console.log(tasksData)
   useEffect(() => {
     if (tasksData) {
       const filteredTasks = tasksData.filter(
@@ -150,7 +153,7 @@ function ProjectPage() {
       setTasksInProgress(filteredTasksByStatus.inProgress);
       setTasksDone(filteredTasksByStatus.done);
     }
-  }, [tasksData, searchQuery]);
+  }, [tasksData, searchQuery, ]);
 
   const { data: projectsData, loading: projectsLoading } = useFetch(
     `http://localhost:1000/api/v1/planpro/projects`,
@@ -174,6 +177,32 @@ function ProjectPage() {
   const handleSearch = (query) => {
     setSearchQuery(query);
   };
+
+  const deleteProject = async (taskId) => {
+    console.log(taskId)
+    console.log(projectData?.id)
+    try {
+      await axios.delete(
+        `http://localhost:1000/api/v1/planpro/projects/${projectData?.id}/tasks/${taskId}`,
+      );
+      
+      const tasksKey = `project-id${projectData?.id}_tasks`;
+
+      let tasks = JSON.parse(sessionStorage.getItem(tasksKey)) || [];
+  
+      // Filter out the task to be deleted
+      tasks = tasks.filter((t) => t.id !== taskId);
+  
+      // Save the updated list back to sessionStorage
+      sessionStorage.setItem(tasksKey, JSON.stringify(tasks));
+      refetchAllProjects();
+      // Navigate back to the project page
+      navigate(`/projects/${projectData?.id}`);
+    } catch (error) {
+      console.error("Error deleting task:", error);
+    }
+  };
+
   return (
     <>
       {projectsLoading ? (
@@ -222,6 +251,7 @@ function ProjectPage() {
                   title="To Do"
                   tasks={tasksToDo}
                   mainStatus="to-do"
+                  onDeleteModalOpen={setDeleteModalItemId}
                 />
               </TaskColumnWrapper>
 
@@ -230,15 +260,26 @@ function ProjectPage() {
                   title="In progress"
                   tasks={tasksInProgress}
                   mainStatus="in-progress"
+                  onDeleteModalOpen={setDeleteModalItemId}
                 />
               </TaskColumnWrapper>
 
               <TaskColumnWrapper>
-                <TaskColumn title="Done" tasks={tasksDone} mainStatus="done" />
+                <TaskColumn title="Done" tasks={tasksDone} mainStatus="done" onDeleteModalOpen={setDeleteModalItemId}/>
               </TaskColumnWrapper>
             </ColumnsContainer>
           )}
         </ProjectPageContainer>
+      )}
+      {deleteModalItemId && (
+        <DeleteModal
+          projectId={deleteModalItemId}
+          onClose={() => setDeleteModalItemId(null)}
+          onDelete={() => {
+            deleteProject(deleteModalItemId);
+            setDeleteModalItemId(null);
+          }}
+        />
       )}
     </>
   );
