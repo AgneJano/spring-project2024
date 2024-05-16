@@ -3,7 +3,6 @@ import projectModel from "../models/projectModel.mjs";
 const projectController = {
   getProjects: async (req, res) => {
     try {
-      console.log(req.query);
       const projects = await projectModel.getProjects(req.query);
       res.status(200).json(projects);
     } catch (error) {
@@ -68,7 +67,7 @@ const projectController = {
       if (!project) {
         return res.status(404).json({ message: "Project not found" });
       }
-      
+
       const taskData = { ...req.body, project_id: projectId };
       const task = await projectModel.createTaskForProjectId(taskData);
 
@@ -85,7 +84,7 @@ const projectController = {
       const projectId = req.params.id;
       console.log("Project ID:", projectId);
       const tasks = await projectModel.getTasksByProjectsId(projectId);
-      console.log("Tasks:", tasks); 
+      console.log("Tasks:", tasks);
       res.status(200).json(tasks);
     } catch (error) {
       console.error(error);
@@ -108,9 +107,6 @@ const projectController = {
     }
   },
 
-
-
-
   getAllTasksCount: async (req, res) => {
     try {
       const tasksCount = await projectModel.getAllTasksCount();
@@ -121,8 +117,6 @@ const projectController = {
     }
   },
 
-
-
   editProjectField: async (req, res) => {
     try {
       const id = req.params.id;
@@ -130,7 +124,7 @@ const projectController = {
 
       const project = await projectModel.editProjectField(id, updatedFields);
       if (!project) {
-        res.status(404).json({ message: 'Project not found.' });
+        res.status(404).json({ message: "Project not found." });
         return;
       }
 
@@ -139,10 +133,9 @@ const projectController = {
       console.error(err);
       res
         .status(500)
-        .json({ message: 'An error occurred while updating the project.' });
+        .json({ message: "An error occurred while updating the project." });
     }
-  }
-
+  },
 };
 
 export default projectController;

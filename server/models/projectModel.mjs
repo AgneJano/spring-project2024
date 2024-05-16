@@ -10,7 +10,6 @@ const projectModel = {
       const limit = parseInt(query.limit) || 12;
       const name = query.name;
 
-
       if (status && paginate) {
         // Case 1: When user needs to use both paginate and status together
         const offset = (page - 1) * limit;

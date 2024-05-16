@@ -186,9 +186,9 @@ const CreateTaskForm = () => {
               Name must be at least 2 characters long.
             </span>
           )}
-          {formData.name && formData.name.length > 50 && (
+          {formData.name && formData.name.length === 50 && (
             <span style={{ color: "red" }}>
-              Name must be at most 50 characters long.
+              Name must be maximum 50 characters long.
             </span>
           )}
         </FormField>

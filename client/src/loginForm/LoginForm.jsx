@@ -108,10 +108,15 @@ function LoginForm() {
       navigate("/");
     } catch (error) {
       console.error("Login error:", error);
-      setServerError("Incorrect email or password. Please try again.");
+      if (error.response && error.response.status === 401) {
+        setServerError("Incorrect email or password. Please try again.");
+      } else if (error.response && error.response.status === 500) {
+        setServerError("An error occurred on the server. Please try again later.");
+      } else {
+        setServerError("An unexpected error occurred. Please try again later.");
+      }
     }
   };
-
   return (
     <Container>
       <Form onSubmit={handleSubmit(onSubmit)}>
