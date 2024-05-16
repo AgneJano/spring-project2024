@@ -1,10 +1,13 @@
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { getTaskIcons, getStatusSvgUrl } from "../mainFunctions";
 import editIcon from "../assets/icons/edit.svg";
 import deleteIcon from "../assets/icons/delete.svg";
 import SyncLoader from "react-spinners/SyncLoader";
 import { useFetch } from "../fetching-data/UseFetch";
+import axios from "axios";
+import { DeleteModal } from "../components/DeleteModal";
+import { useState } from "react";
 
 const TaskPageWrapper = styled.div`
   display: flex;
@@ -98,6 +101,12 @@ const LoadingContainer = styled.div`
 
 const TaskPage = () => {
   const { projectId, taskId } = useParams();
+  const [deleteModalItemId, setDeleteModalItemId] = useState(null);
+  const navigate = useNavigate();
+
+  const onDeleteClick = async (taskId) => {
+    setDeleteModalItemId(taskId);
+  };
 
   const getStatusDisplayText = (status) => {
     const statusMap = {
@@ -124,6 +133,28 @@ const TaskPage = () => {
 
   const task = tasksData.find((task) => task.id === Number(taskId));
 
+  const deleteTask = async () => {
+    try {
+      await axios.delete(
+        `http://localhost:1000/api/v1/planpro/projects/${projectId}/tasks/${task.id}`,
+      );
+      
+      const tasksKey = `project-id${projectId}_tasks`;
+      let tasks = JSON.parse(sessionStorage.getItem(tasksKey)) || [];
+  
+      // Filter out the task to be deleted
+      tasks = tasks.filter((t) => t.id !== task.id);
+  
+      // Save the updated list back to sessionStorage
+      sessionStorage.setItem(tasksKey, JSON.stringify(tasks));
+  
+      // Navigate back to the project page
+      navigate(`/projects/${projectId}`);
+    } catch (error) {
+      console.error("Error deleting task:", error);
+    }
+  };
+
   return (
     <>
       {task && (
@@ -138,7 +169,7 @@ const TaskPage = () => {
                   src={deleteIcon}
                   onClick={() => {
                     console.log("Icon clicked");
-                    handleDelete(task?.id);
+                    onDeleteClick(task?.id);
                   }}
                 />
               </ImageContainer>
@@ -199,6 +230,16 @@ const TaskPage = () => {
         <LoadingContainer>
           <SyncLoader color={"#FFC107"} loading={tasksLoading} size={20} />
         </LoadingContainer>
+      )}
+    {deleteModalItemId && (
+        <DeleteModal
+          projectId={deleteModalItemId}
+          onClose={() => setDeleteModalItemId(null)}
+          onDelete={() => {
+            deleteTask();
+            setDeleteModalItemId(null);
+          }}
+        />
       )}
     </>
   );

@@ -78,8 +78,11 @@ const StatusBubble = styled.img`
   width: 1.375rem;
 `;
 
-function TaskColumn({ tasks, title, mainStatus }) {
-  const onDeleteClick = async (taskId) => {};
+function TaskColumn({ tasks, title, mainStatus, onDeleteModalOpen }) {
+  const onDeleteClick = async (projectId) => {
+    onDeleteModalOpen(projectId);
+  };
+
   return (
     <ColumnContainer>
       <Header>
@@ -100,7 +103,9 @@ function TaskColumn({ tasks, title, mainStatus }) {
             </TaskContent>
             <ImageContainer>
               <img src={getTaskIcons(task.priority)} alt="Priority Icon" />
-              <StyledIcon src={editIcon} />
+              <Link to={`/projects/${task.project_id}/tasks/${task.id}/edit`}>
+                  <StyledIcon src={editIcon} />
+                </Link>
               <StyledIcon
                 src={deleteIcon}
                 onClick={() => {

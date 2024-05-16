@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
+import { useFetch } from "../fetching-data/UseFetch";
+import SyncLoader from "react-spinners/SyncLoader";
 
 const RegistrationContainer = styled.div`
   display: flex;
@@ -100,10 +102,18 @@ const Select = styled.select`
   }
 `;
 
+const LoadingContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+`;
+
 function EditTaskPage() {
   const navigate = useNavigate();
   const { projectId, taskId } = useParams();
   const [errors, setErrors] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -112,23 +122,35 @@ function EditTaskPage() {
   });
 
   useEffect(() => {
-    if (taskId && projectId) {
+    const tasksKey = `project-id${projectId}_tasks`;
+    const tasksJson = sessionStorage.getItem(tasksKey);
+    const tasks = tasksJson ? JSON.parse(tasksJson) : [];
+    const taskInStorage = tasks.find(task => task.id === parseInt(taskId));
+    if (taskInStorage) {
+      setFormData({
+        name: taskInStorage.name || '',
+        description: taskInStorage.description || '',
+        status: taskInStorage.status || '',
+        priority: taskInStorage.priority || '',
+      });
+    } else {
       const fetchTask = async () => {
         try {
           const response = await axios.get(
             `http://localhost:1000/api/v1/planpro/projects/${projectId}/tasks/${taskId}`,
           );
+          const taskData = response.data;
           setFormData({
-            name: response.data?.name || '',
-            description: response.data?.description || '',
-            status: response.data?.status || '',
-            priority: response.data?.priority || '',
+            name: taskData.name || '',
+            description: taskData.description || '',
+            status: taskData.status || '',
+            priority: taskData.priority || '',
           });
         } catch (error) {
-          console.error('Error fetching project:', error);
+          console.error('Error fetching task:', error);
+          setErrors(error);
         }
       };
-
       fetchTask();
     }
   }, [projectId, taskId]);
@@ -142,15 +164,39 @@ function EditTaskPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+
+    if (errors !== null) {
+      return;
+    }
 
     try {
-      console.log(formData);
-      await axios.patch(`http://localhost:1000/api/v1/planpro/projects/${projectId}/tasks/${taskId}`, formData);
+      const response = await axios.patch(
+        `http://localhost:1000/api/v1/planpro/projects/${projectId}/tasks/${taskId}/edit`,
+        formData,
+      );
 
-      navigate(`/projects/${projectId}/tasks/${taskId}`);
+      const updatedTask = response.data;
+
+      const tasksKey = `project-id${projectId}_tasks`;
+      const tasksJson = sessionStorage.getItem(tasksKey);
+      const tasks = tasksJson ? JSON.parse(tasksJson) : [];
+      const updatedTasks = tasks.map(task => {
+        if (task.id === parseInt(taskId)) {
+          return updatedTask;
+        } else {
+          return task;
+        }
+      });
+
+      sessionStorage.setItem(tasksKey, JSON.stringify(updatedTasks));
+
+      navigate(`/projects/${projectId}`);
     } catch (error) {
       setErrors(error);
       console.error('Error updating task:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -204,8 +250,8 @@ function EditTaskPage() {
           <Label htmlFor="status">Status:</Label>
           <Select id="status" name="status" value={formData.status} onChange={handleChange} required>
             <option value="">Select status</option>
-            <option value="to do">To Do</option>
-            <option value="in progress">In Progress</option>
+            <option value="to-do">To Do</option>
+            <option value="in-progress">In Progress</option>
             <option value="done">Done</option>
           </Select>
         </FormField>
@@ -218,8 +264,13 @@ function EditTaskPage() {
             <option value="high">High</option>
           </Select>
         </FormField>
-
-        <SubmitButton type="submit">Submit</SubmitButton>
+        {loading ? (
+          <LoadingContainer>
+            <SyncLoader color={"#FFC107"} loading={loading} size={20} />
+          </LoadingContainer>
+        ) : (
+          <SubmitButton type="submit">Submit</SubmitButton>
+        )}
       </StyledForm>
     </RegistrationContainer>
   );

@@ -69,7 +69,12 @@ const projectController = {
         return res.status(404).json({ message: "Project not found" });
       }
 
-      const taskData = { ...req.body, project_id: projectId };
+      const taskData = { 
+        ...req.body, 
+        project_id: projectId,
+        created_on: new Date(),
+        updated_on: new Date(),
+      };
       const task = await projectModel.createTaskForProjectId(taskData);
 
       res.status(201).json(task);
@@ -126,8 +131,42 @@ const projectController = {
         .status(500)
         .json({ message: 'An error occurred while updating the project.' });
     }
-  }
+  },
 
-};
+  editTask: async (req, res) => {
+    try {
+      const taskId = req.params.id;
+      const editFields = req.body;
+      const task = await projectModel.editTaskFields(taskId, editFields);
+
+      if (!task) {
+        res.status(404).json({ message: 'Task not found.' });
+        return;
+      }
+
+      res.status(200).json(task);
+    } catch (error) {
+      console.error(error);
+      res
+        .status(500)
+        .json({ message: 'An error occurred while updating the task.' });
+    }
+    },
+    deleteTask: async (req, res) => {
+      try {
+        const taskId = req.params.id;
+        const deletedTask = await projectModel.deleteTask(taskId);
+        if (!deletedTask) {
+          return res.status(404).json({ message: "Task not found." });
+        }
+        res
+          .status(200)
+          .json({ message: "Task deleted successfully", deletedTask });
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "An error occurred while deleting task." });
+      }
+    }
+  };
 
 export default projectController;
