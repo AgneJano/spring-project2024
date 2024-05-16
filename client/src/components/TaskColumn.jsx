@@ -8,6 +8,7 @@ const ColumnContainer = styled.div`
   flex: 1;
   border-radius: 5px;
   margin: 1.25rem auto 0;
+  width: 100%;
 `;
 
 const ColumnTitle = styled.div`
@@ -45,8 +46,11 @@ const StyledLink = styled(Link)`
   text-decoration: none;
   color: #000000;
   cursor: pointer;
-  font-size: 16px
+  font-size: 1rem;
   font-family: "Poppins", sans-serif;
+  word-break: break-word;
+  user-select: none;
+  margin-right: 1rem;
 `;
 
 const TaskDate = styled.span`
