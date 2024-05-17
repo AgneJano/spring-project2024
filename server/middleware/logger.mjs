@@ -1,9 +1,9 @@
 import winston from "winston";
 import expressWinston from "express-winston";
 import { MongoDB } from "winston-mongodb";
-// import dotenv from 'dotenv';
+import dotenv from 'dotenv';
 
-// dotenv.config();
+dotenv.config();
 
 // myLevels yra objektas, kuriame yra nurodytos logavimo lygių reikšmės.
 const myLevels = {
