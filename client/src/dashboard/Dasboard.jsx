@@ -7,6 +7,7 @@ import CheckmarkIcon from '../assets/icons/checkmark.svg';
 import Prioritymark from '../assets/icons/priority-mark.svg';
 import { getStatusSvgUrl, getTaskIcons } from '../mainFunctions';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 
 const DashboardContainer = styled.div`
   display: flex;
@@ -33,9 +34,9 @@ const RightColumn = styled.div`
 `;
 
 const InfoBox = styled.div`
-  width: 90%; 
-  max-width: 200px; 
-  height: auto; 
+  width: 90%;
+  max-width: 200px;
+  height: auto;
   padding: 1rem;
   display: flex;
   flex-direction: column;
@@ -60,9 +61,9 @@ const StyledIcon = styled.img`
 `;
 
 const PriorityIcon = styled.img`
-width: 1rem;
-height: 1rem;
-margin-right: 0.5rem;
+  width: 1rem;
+  height: 1rem;
+  margin-right: 0.5rem;
 `;
 
 const StyledInfoContent = styled.div`
@@ -74,7 +75,6 @@ const Label = styled(StyledInfoContent)`
   color: #000000;
   flex: 1;
   margin-top: 0;
-  
 `;
 
 const TotalInfo = styled(StyledInfoContent)`
@@ -85,8 +85,8 @@ const ActiveInfo = styled(StyledInfoContent)`
   color: #ff89c4;
 `;
 const InProgressInfo = styled(StyledInfoContent)`
-  color: #FFC107;
-  `;
+  color: #ffc107;
+`;
 
 const DoneInfo = styled(StyledInfoContent)`
   color: #92e044;
@@ -98,12 +98,12 @@ const ManageLink = styled.a`
   color: #c7c6c6;
   text-decoration: none;
   cursor: pointer;
-  white-space: nowrap; 
+  white-space: nowrap;
 `;
 const StyledInfoItem = styled.div`
   display: flex;
   align-items: center;
-  margin-right:0.5rem;
+  margin-right: 0.5rem;
   width: 100%;
 `;
 
@@ -111,7 +111,7 @@ const ProjectItem = styled.div`
   display: flex;
   align-items: center;
   padding: 0.8rem;
-  border: 1px solid #DDDDDD;
+  border: 1px solid #dddddd;
   border-radius: 5px;
   margin-bottom: 0.7rem;
 
@@ -128,42 +128,57 @@ const StyledLink = styled(Link)`
 
 export const Dashboard = () => {
   const { user } = useContext(AuthContext);
+  
+  const { data: projectsData, loading: projectsLoading } = useFetch(`http://localhost:1000/api/v1/planpro/projects`, 'projects');
+  const { data: tasksCountData, loading: tasksCountLoading } = useFetch(`http://localhost:1000/api/v1/planpro/projects/tasks/count`, 'tasksCount');
+
   const [projectsInfo, setProjectsInfo] = useState({ total: 0, active: 0, done: 0 });
   const [tasksCount, setTasksCount] = useState(null);
-
-
-
-
-  const { refetch: refetchProjects, data: projectsData, loading: projectsLoading } = useFetch(
-    `http://localhost:1000/api/v1/planpro/projects`,
-    'projects'
-  );
-  const { refetch: refetchTasksCount, data: tasksCountData, loading: tasksCountLoading } = useFetch(
-    `http://localhost:1000/api/v1/planpro/projects/tasks/count`,
-    'tasksCount'
-  );
-
-  useEffect(() => {
-    refetchProjects();
-    refetchTasksCount();
-  }, []);
-
 
   useEffect(() => {
     if (!projectsLoading && projectsData) {
       let totalProjects = projectsData.length;
-      let activeProjects = projectsData.filter(project => project.status === 'active').length;
-      let doneProjects = projectsData.filter(project => project.status === 'done').length;
+      let activeProjects = projectsData.filter((project) => project.status === 'in-progress').length;
+      let doneProjects = projectsData.filter((project) => project.status === 'done').length;
 
       setProjectsInfo({ total: totalProjects, active: activeProjects, done: doneProjects });
     }
   }, [projectsData, projectsLoading]);
 
   useEffect(() => {
+    console.log("Tasks Count Data:", tasksCountData);
     if (!tasksCountLoading && tasksCountData) {
       setTasksCount(tasksCountData);
     }
   }, [tasksCountData, tasksCountLoading]);
+
+  useEffect(() => {
+    const handleStorageChange = (event) => {
+      if (event.key === 'projects' || event.key === 'tasksCount') {
+        window.location.reload();
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
+
+  useEffect(() => {
+    const fetchTasksCount = async () => {
+      try {
+        const response = await axios.get('http://localhost:1000/api/v1/planpro/projects/tasks/count');
+        setTasksCount(response.data);
+      } catch (error) {
+        console.error('Error fetching tasks count:', error);
+      }
+    };
+  
+    fetchTasksCount();
+  }, []);
+
 
   return (
     <DashboardContainer>
@@ -174,19 +189,18 @@ export const Dashboard = () => {
             Welcome, {user.name}! You are logged in as {user.role}. Here you can manage your projects, tasks, and more.
           </UserInfo>
         )}
- {projectsData && (
-  <div>
-    {projectsData.map(project => (
-      <StyledLink to={`/projects/${project.id}`} key={project.id}>
-        <ProjectItem>
-          <img src={getStatusSvgUrl(project.status)} alt={project.status} />
-          <span>{project.name}</span>
-        </ProjectItem>
-      </StyledLink>
-    ))}
-  </div>
-)}
-
+        {projectsData && (
+          <div>
+            {projectsData.map((project) => (
+              <StyledLink to={`/projects/${project.id}`} key={project.id}>
+                <ProjectItem>
+                  <img src={getStatusSvgUrl(project.status)} alt={project.status} />
+                  <span>{project.name}</span>
+                </ProjectItem>
+              </StyledLink>
+            ))}
+          </div>
+        )}
       </div>
       <RightColumn>
         <InfoBox>
@@ -195,71 +209,71 @@ export const Dashboard = () => {
             Projects
           </StyledInfoTitle>
           <StyledInfoItem>
-          <Label>Total</Label>
-          <TotalInfo>{projectsInfo.total}</TotalInfo>
+            <Label>Total</Label>
+            <TotalInfo>{projectsInfo.total}</TotalInfo>
           </StyledInfoItem>
           <StyledInfoItem>
-          <Label>Active</Label>
-          <ActiveInfo>{projectsInfo.active}</ActiveInfo>
+            <Label>Active</Label>
+            <ActiveInfo>{projectsInfo.active}</ActiveInfo>
           </StyledInfoItem>
           <StyledInfoItem>
-          <Label>Done</Label>
-          <DoneInfo>{projectsInfo.done}</DoneInfo>
+            <Label>Done</Label>
+            <DoneInfo>{projectsInfo.done}</DoneInfo>
           </StyledInfoItem>
           <StyledInfoItem>
-          <ManageLink href="/projects">Manage your projects</ManageLink>
+            <ManageLink href="/projects">Manage your projects</ManageLink>
           </StyledInfoItem>
         </InfoBox>
         <InfoBox>
-  <StyledInfoTitle>
-    <StyledIcon src={CheckmarkIcon} alt="Checkmark Icon" />
-    Tasks
-  </StyledInfoTitle>
-  <StyledInfoItem>
-    <Label>Total</Label>
-    <TotalInfo>{tasksCount && tasksCount.total_tasks}</TotalInfo>
-  </StyledInfoItem>
-  <StyledInfoItem>
-    <Label>To do</Label>
-    <ActiveInfo>{tasksCount && tasksCount.to_do}</ActiveInfo>
-  </StyledInfoItem>
-  <StyledInfoItem>
-    <Label>In progress</Label>
-    <InProgressInfo>{tasksCount && tasksCount.in_progress}</InProgressInfo>
-  </StyledInfoItem>
-  <StyledInfoItem>
-    <Label>Done</Label>
-    <DoneInfo>{tasksCount && tasksCount.done}</DoneInfo>
-  </StyledInfoItem>
-  <StyledInfoItem>
-    <ManageLink href="/projects">Manage your projects</ManageLink>
-  </StyledInfoItem>
-</InfoBox>
+          <StyledInfoTitle>
+            <StyledIcon src={CheckmarkIcon} alt="Checkmark Icon" />
+            Tasks
+          </StyledInfoTitle>
+          <StyledInfoItem>
+            <Label>Total</Label>
+            <TotalInfo>{tasksCount && tasksCount.total_tasks}</TotalInfo>
+          </StyledInfoItem>
+          <StyledInfoItem>
+            <Label>To do</Label>
+            <ActiveInfo>{tasksCount && tasksCount.to_do}</ActiveInfo>
+          </StyledInfoItem>
+          <StyledInfoItem>
+            <Label>In progress</Label>
+            <InProgressInfo>{tasksCount && tasksCount.in_progress}</InProgressInfo>
+          </StyledInfoItem>
+          <StyledInfoItem>
+            <Label>Done</Label>
+            <DoneInfo>{tasksCount && tasksCount.done}</DoneInfo>
+          </StyledInfoItem>
+          <StyledInfoItem>
+            <ManageLink href="/projects">Manage your projects</ManageLink>
+          </StyledInfoItem>
+        </InfoBox>
 
-<InfoBox>
-  <StyledInfoTitle>
-    <StyledIcon src={Prioritymark} alt="Priority Icon" />
-    Tasks priority
-  </StyledInfoTitle>
-  <StyledInfoItem>
-    <PriorityIcon src={getTaskIcons('high')} alt="High priority" />
-    <Label>High</Label>
-    <TotalInfo>{tasksCount && tasksCount.high_priority}</TotalInfo>
-  </StyledInfoItem>
-  <StyledInfoItem>
-    <PriorityIcon src={getTaskIcons('medium')} alt="Medium priority" />
-    <Label>Medium</Label>
-    <TotalInfo>{tasksCount && tasksCount.medium_priority}</TotalInfo>
-  </StyledInfoItem>
-  <StyledInfoItem>
-    <PriorityIcon src={getTaskIcons('low')} alt="Low priority" />
-    <Label>Low</Label>
-    <TotalInfo>{tasksCount && tasksCount.low_priority}</TotalInfo>
-  </StyledInfoItem>
-  <StyledInfoItem>
-    <ManageLink href="/projects">Manage your projects</ManageLink>
-  </StyledInfoItem>
-</InfoBox>
+        <InfoBox>
+          <StyledInfoTitle>
+            <StyledIcon src={Prioritymark} alt="Priority Icon" />
+            Tasks priority
+          </StyledInfoTitle>
+          <StyledInfoItem>
+            <PriorityIcon src={getTaskIcons('high')} alt="High priority" />
+            <Label>High</Label>
+            <TotalInfo>{tasksCount && tasksCount.high_priority}</TotalInfo>
+          </StyledInfoItem>
+          <StyledInfoItem>
+            <PriorityIcon src={getTaskIcons('medium')} alt="Medium priority" />
+            <Label>Medium</Label>
+            <TotalInfo>{tasksCount && tasksCount.medium_priority}</TotalInfo>
+          </StyledInfoItem>
+          <StyledInfoItem>
+            <PriorityIcon src={getTaskIcons('low')} alt="Low priority" />
+            <Label>Low</Label>
+            <TotalInfo>{tasksCount && tasksCount.low_priority}</TotalInfo>
+          </StyledInfoItem>
+          <StyledInfoItem>
+            <ManageLink href="/projects">Manage your projects</ManageLink>
+          </StyledInfoItem>
+        </InfoBox>
       </RightColumn>
     </DashboardContainer>
   );
