@@ -1,6 +1,9 @@
 import userModel from "../models/userModel.mjs";
 import bcrypt from "bcrypt";
 import { MongoClient } from "mongodb";
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const userController = {
   createUser: async (req, res) => {
