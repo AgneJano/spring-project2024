@@ -28,5 +28,9 @@ router.patch(
   "/:id", 
   validate(projectValidationSchema),
   projectController.editProjectField);
+router.patch("/:projectId/tasks/:id/edit", 
+projectController.editTask);
+router.delete("/:projectId/tasks/:id",
+projectController.deleteTask);
 
 export default router;

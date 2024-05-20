@@ -5,6 +5,7 @@ import { connectDB } from "./db/postgresConnection.mjs";
 import usersRouter from "./routes/index.mjs";
 import projectsRouter from "./routes/index.mjs";
 import cors from "cors";
+import { expressLogger } from "./middleware/logger.mjs";
 
 dotenv.config();
 
@@ -22,7 +23,7 @@ const startServer = async () => {
         credentials: true, // Allow cookies and authorization headers
       })
     );
-
+    app.use(expressLogger);
     app.use(express.json()); //must be before the route !!
     app.use(passport.initialize());
 
@@ -33,9 +34,8 @@ const startServer = async () => {
     app.listen(PORT, () => {
       console.log(`Server is listening on port ${PORT}`);
     });
-
   } catch (error) {
-    console.error('Failed to connect to the server or database', error);
+    console.error("Failed to connect to the server or database", error);
   }
 };
 

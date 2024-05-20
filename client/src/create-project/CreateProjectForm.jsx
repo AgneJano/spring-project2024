@@ -163,6 +163,19 @@ const CreateProjectForm = () => {
             maxLength={50}
             required
           />
+          {formData.name && formData.name.length === 0 && (
+            <span style={{ color: "red" }}>Name is required.</span>
+          )}
+          {formData.name && formData.name.length < 2 && (
+            <span style={{ color: "red" }}>
+              Name must be at least 2 characters long.
+            </span>
+          )}
+          {formData.name && formData.name.length === 50 && (
+            <span style={{ color: "red" }}>
+              Name must be maximum 50 characters long.
+            </span>
+          )}
         </FormField>
         <FormField>
           <Label htmlFor="description">Description:</Label>
@@ -175,6 +188,19 @@ const CreateProjectForm = () => {
             maxLength={10000}
             required
           />
+          {formData.description && formData.description.length === 0 && (
+            <span style={{ color: "red" }}>Description is required.</span>
+          )}
+          {formData.description && formData.description.length < 2 && (
+            <span style={{ color: "red" }}>
+              Description must be at least 2 characters long.
+            </span>
+          )}
+          {formData.description && formData.description.length === 10000 && (
+            <span style={{ color: "red" }}>
+              Description must be at most 10000 characters long.
+            </span>
+          )}
         </FormField>
         <p>{errors}</p>
         {loading ? (

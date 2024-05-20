@@ -1,12 +1,13 @@
-import { useContext, useEffect, useState } from "react";
-import { AuthContext } from "../utils/AuthContext";
-import { styled } from "styled-components";
-import { useFetch } from "../fetching-data/UseFetch";
-import FolderIcon from "../assets/icons/folder.svg";
-import CheckmarkIcon from "../assets/icons/checkmark.svg";
-import Prioritymark from "../assets/icons/priority-mark.svg";
-import { getStatusSvgUrl, getTaskIcons } from "../mainFunctions";
-import { Link } from "react-router-dom";
+import { useContext, useEffect, useState } from 'react';
+import { AuthContext } from '../utils/AuthContext';
+import { styled } from 'styled-components';
+import { useFetch } from '../fetching-data/UseFetch';
+import FolderIcon from '../assets/icons/folder.svg';
+import CheckmarkIcon from '../assets/icons/checkmark.svg';
+import Prioritymark from '../assets/icons/priority-mark.svg';
+import { getStatusSvgUrl, getTaskIcons } from '../mainFunctions';
+import { Link } from 'react-router-dom';
+import axios from 'axios';
 
 const DashboardContainer = styled.div`
   display: flex;
@@ -127,41 +128,18 @@ const StyledLink = styled(Link)`
 
 export const Dashboard = () => {
   const { user } = useContext(AuthContext);
-  const [projectsInfo, setProjectsInfo] = useState({
-    total: 0,
-    active: 0,
-    done: 0,
-  });
+  
+  const { data: projectsData, loading: projectsLoading } = useFetch(`http://localhost:1000/api/v1/planpro/projects`, 'projects');
+  const { data: tasksCountData, loading: tasksCountLoading } = useFetch(`http://localhost:1000/api/v1/planpro/projects/tasks/count`, 'tasksCount');
+
+  const [projectsInfo, setProjectsInfo] = useState({ total: 0, active: 0, done: 0 });
   const [tasksCount, setTasksCount] = useState(null);
-
-  const {
-    refetch: refetchProjects,
-    data: projectsData,
-    loading: projectsLoading,
-  } = useFetch(`http://localhost:1000/api/v1/planpro/projects`, "projects");
-  const {
-    refetch: refetchTasksCount,
-    data: tasksCountData,
-    loading: tasksCountLoading,
-  } = useFetch(
-    `http://localhost:1000/api/v1/planpro/projects/tasks/count`,
-    "tasksCount",
-  );
-
-  useEffect(() => {
-    refetchProjects();
-    refetchTasksCount();
-  }, []);
 
   useEffect(() => {
     if (!projectsLoading && projectsData) {
       let totalProjects = projectsData.length;
-      let activeProjects = projectsData.filter(
-        (project) => project.status === "active",
-      ).length;
-      let doneProjects = projectsData.filter(
-        (project) => project.status === "done",
-      ).length;
+      let activeProjects = projectsData.filter((project) => project.status === 'in-progress').length;
+      let doneProjects = projectsData.filter((project) => project.status === 'done').length;
 
       setProjectsInfo({
         total: totalProjects,
@@ -172,10 +150,39 @@ export const Dashboard = () => {
   }, [projectsData, projectsLoading]);
 
   useEffect(() => {
+    console.log("Tasks Count Data:", tasksCountData);
     if (!tasksCountLoading && tasksCountData) {
       setTasksCount(tasksCountData);
     }
   }, [tasksCountData, tasksCountLoading]);
+
+  useEffect(() => {
+    const handleStorageChange = (event) => {
+      if (event.key === 'projects' || event.key === 'tasksCount') {
+        window.location.reload();
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
+
+  useEffect(() => {
+    const fetchTasksCount = async () => {
+      try {
+        const response = await axios.get('http://localhost:1000/api/v1/planpro/projects/tasks/count');
+        setTasksCount(response.data);
+      } catch (error) {
+        console.error('Error fetching tasks count:', error);
+      }
+    };
+  
+    fetchTasksCount();
+  }, []);
+
 
   return (
     <DashboardContainer>
@@ -192,10 +199,7 @@ export const Dashboard = () => {
             {projectsData.map((project) => (
               <StyledLink to={`/projects/${project.id}`} key={project.id}>
                 <ProjectItem>
-                  <img
-                    src={getStatusSvgUrl(project.status)}
-                    alt={project.status}
-                  />
+                  <img src={getStatusSvgUrl(project.status)} alt={project.status} />
                   <span>{project.name}</span>
                 </ProjectItem>
               </StyledLink>
@@ -240,9 +244,7 @@ export const Dashboard = () => {
           </StyledInfoItem>
           <StyledInfoItem>
             <Label>In progress</Label>
-            <InProgressInfo>
-              {tasksCount && tasksCount.in_progress}
-            </InProgressInfo>
+            <InProgressInfo>{tasksCount && tasksCount.in_progress}</InProgressInfo>
           </StyledInfoItem>
           <StyledInfoItem>
             <Label>Done</Label>
@@ -259,17 +261,17 @@ export const Dashboard = () => {
             Tasks priority
           </StyledInfoTitle>
           <StyledInfoItem>
-            <PriorityIcon src={getTaskIcons("high")} alt="High priority" />
+            <PriorityIcon src={getTaskIcons('high')} alt="High priority" />
             <Label>High</Label>
             <TotalInfo>{tasksCount && tasksCount.high_priority}</TotalInfo>
           </StyledInfoItem>
           <StyledInfoItem>
-            <PriorityIcon src={getTaskIcons("medium")} alt="Medium priority" />
+            <PriorityIcon src={getTaskIcons('medium')} alt="Medium priority" />
             <Label>Medium</Label>
             <TotalInfo>{tasksCount && tasksCount.medium_priority}</TotalInfo>
           </StyledInfoItem>
           <StyledInfoItem>
-            <PriorityIcon src={getTaskIcons("low")} alt="Low priority" />
+            <PriorityIcon src={getTaskIcons('low')} alt="Low priority" />
             <Label>Low</Label>
             <TotalInfo>{tasksCount && tasksCount.low_priority}</TotalInfo>
           </StyledInfoItem>
