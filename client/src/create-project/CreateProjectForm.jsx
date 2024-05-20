@@ -3,7 +3,6 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import SyncLoader from "react-spinners/SyncLoader";
-import { useFetch } from "../fetching-data/UseFetch";
 
 const RegistrationContainer = styled.div`
   display: flex;
@@ -117,14 +116,33 @@ const CreateProjectForm = () => {
     });
   };
 
-  const handleSubmit = async (e) => {
-    setLoading(true);
-    if (errors !== null) {
-      return;
-    }
-    e.preventDefault();
-    try {
+  // Validation function to check form data
+  const validateForm = () => {
+    let valid = true;
+    const newErrors = {};
 
+    if (!formData.name || formData.name.length < 2 || formData.name.length > 50) {
+      valid = false;
+      newErrors.name = "Name must be between 2 and 50 characters long.";
+    }
+
+    if (!formData.description || formData.description.length < 2 || formData.description.length > 10000) {
+      valid = false;
+      newErrors.description = "Description must be between 2 and 10000 characters long.";
+    }
+
+    setErrors(newErrors);
+    return valid;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!validateForm()) {
+      return; // Do not proceed if the form is invalid
+    }
+
+    setLoading(true);
+    try {
       const response = await axios.post(
         "http://localhost:1000/api/v1/planpro/projects",
         formData,
@@ -140,7 +158,7 @@ const CreateProjectForm = () => {
 
       navigate("/projects");
     } catch (error) {
-      setErrors(error);
+      setErrors({ api: "Error creating project: " + error.message });
       console.error("Error creating project:", error);
     } finally {
       setLoading(false);
@@ -202,7 +220,7 @@ const CreateProjectForm = () => {
             </span>
           )}
         </FormField>
-        <p>{errors}</p>
+        {errors && <p style={{ color: "red" }}>{errors.api}</p>}
         {loading ? (
           <LoadingContainer>
             <SyncLoader color={"#FFC107"} loading={loading} size={20} />
