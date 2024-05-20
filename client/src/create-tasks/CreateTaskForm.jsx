@@ -110,6 +110,7 @@ const LoadingContainer = styled.div`
   align-items: center;
   height: 200px;
 `;
+
 const CreateTaskForm = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -118,7 +119,7 @@ const CreateTaskForm = () => {
     name: "",
     description: "",
   });
-  const [priority, setPriority] = useState("medium"); // State variable for priority
+  const [priority, setPriority] = useState("medium");
 
   const handleChange = (e) => {
     setFormData({
@@ -139,21 +140,40 @@ const CreateTaskForm = () => {
         `http://localhost:1000/api/v1/planpro/projects/${id}/tasks`,
         { ...formData, priority },
       );
-
+  
       const newTask = response.data;
-
+  
+      // Update project task count only if the ID matches the project ID
+      let projectsData = JSON.parse(sessionStorage.getItem("projects"));
+      if (projectsData) {
+        const updatedProjectsData = projectsData.map((project) => {
+          if (project.id === parseInt(id)) {
+            const currentTotalTasks = Number(project.total_tasks) || 0;
+            const updatedTotalTasks = currentTotalTasks + 1;
+            return {
+              ...project,
+              total_tasks: updatedTotalTasks.toString(),
+            };
+          }
+          return project;
+        });
+  
+        sessionStorage.setItem("projects", JSON.stringify(updatedProjectsData));
+      }
+  
       const storedTasks = sessionStorage.getItem(`project-id${id}_tasks`);
       let tasks = [];
-
+  
       if (storedTasks) {
         tasks = JSON.parse(storedTasks);
       }
-
+  
       tasks.push(newTask);
-
+  
       const updatedTasksData = JSON.stringify(tasks);
-
+  
       sessionStorage.setItem(`project-id${id}_tasks`, updatedTasksData);
+  
       navigate(`/projects/${id}`);
     } catch (error) {
       console.error("Error creating project:", error);
@@ -161,6 +181,7 @@ const CreateTaskForm = () => {
       setLoading(false);
     }
   };
+  
 
   return (
     <RegistrationContainer>
@@ -178,19 +199,6 @@ const CreateTaskForm = () => {
             maxLength={50}
             required
           />
-          {formData.name && formData.name.length === 0 && (
-            <span style={{ color: "red" }}>Name is required.</span>
-          )}
-          {formData.name && formData.name.length < 2 && (
-            <span style={{ color: "red" }}>
-              Name must be at least 2 characters long.
-            </span>
-          )}
-          {formData.name && formData.name.length > 50 && (
-            <span style={{ color: "red" }}>
-              Name must be at most 50 characters long.
-            </span>
-          )}
         </FormField>
         <FormField>
           <Label htmlFor="description">Description:</Label>
@@ -203,19 +211,6 @@ const CreateTaskForm = () => {
             maxLength={10000}
             required
           />
-          {formData.description && formData.description.length === 0 && (
-            <span style={{ color: "red" }}>Description is required.</span>
-          )}
-          {formData.description && formData.description.length < 2 && (
-            <span style={{ color: "red" }}>
-              Description must be at least 2 characters long.
-            </span>
-          )}
-          {formData.description && formData.description.length === 10000 && (
-            <span style={{ color: "red" }}>
-              Description must be at most 10000 characters long.
-            </span>
-          )}
         </FormField>
         <FormField>
           <Label htmlFor="priority">Priority:</Label>
