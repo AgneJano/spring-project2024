@@ -77,7 +77,7 @@ const LogItem = styled.div`
         return 'inherit';
     }
   }};
-  color: ${({ level }) => (level === 'error' ? '#ff0000' : level === 'warning' ? '#0000ff' : '#666666')};
+  color: ${({ level }) => (level === 'error' ? '#666666' : level === 'warn' ? '##666666' : '#666666')};
 `;
 
 const PaginationContainer = styled.div`
