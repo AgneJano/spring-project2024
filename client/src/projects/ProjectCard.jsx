@@ -136,8 +136,6 @@ export const ProjectCard = ({
                 src={deleteIcon}
                 onClick={(e) => {
                   e.stopPropagation();
-
-                  console.log("delete");
                   onDeleteClick(id);
                 }}
               />

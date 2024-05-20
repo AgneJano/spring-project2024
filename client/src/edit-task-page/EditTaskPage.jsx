@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
-import axios from 'axios';
-import { useNavigate, useParams } from 'react-router-dom';
-import styled from 'styled-components';
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { useNavigate, useParams } from "react-router-dom";
+import styled from "styled-components";
 import { useFetch } from "../fetching-data/UseFetch";
 import SyncLoader from "react-spinners/SyncLoader";
 
@@ -115,23 +115,23 @@ function EditTaskPage() {
   const [errors, setErrors] = useState(null);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    status: '',
-    priority: '',
+    name: "",
+    description: "",
+    status: "",
+    priority: "",
   });
 
   useEffect(() => {
     const tasksKey = `project-id${projectId}_tasks`;
     const tasksJson = sessionStorage.getItem(tasksKey);
     const tasks = tasksJson ? JSON.parse(tasksJson) : [];
-    const taskInStorage = tasks.find(task => task.id === parseInt(taskId));
+    const taskInStorage = tasks.find((task) => task.id === parseInt(taskId));
     if (taskInStorage) {
       setFormData({
-        name: taskInStorage.name || '',
-        description: taskInStorage.description || '',
-        status: taskInStorage.status || '',
-        priority: taskInStorage.priority || '',
+        name: taskInStorage.name || "",
+        description: taskInStorage.description || "",
+        status: taskInStorage.status || "",
+        priority: taskInStorage.priority || "",
       });
     } else {
       const fetchTask = async () => {
@@ -141,13 +141,13 @@ function EditTaskPage() {
           );
           const taskData = response.data;
           setFormData({
-            name: taskData.name || '',
-            description: taskData.description || '',
-            status: taskData.status || '',
-            priority: taskData.priority || '',
+            name: taskData.name || "",
+            description: taskData.description || "",
+            status: taskData.status || "",
+            priority: taskData.priority || "",
           });
         } catch (error) {
-          console.error('Error fetching task:', error);
+          console.error("Error fetching task:", error);
           setErrors(error);
         }
       };
@@ -181,7 +181,7 @@ function EditTaskPage() {
       const tasksKey = `project-id${projectId}_tasks`;
       const tasksJson = sessionStorage.getItem(tasksKey);
       const tasks = tasksJson ? JSON.parse(tasksJson) : [];
-      const updatedTasks = tasks.map(task => {
+      const updatedTasks = tasks.map((task) => {
         if (task.id === parseInt(taskId)) {
           return updatedTask;
         } else {
@@ -191,10 +191,33 @@ function EditTaskPage() {
 
       sessionStorage.setItem(tasksKey, JSON.stringify(updatedTasks));
 
+      let projectsData = JSON.parse(sessionStorage.getItem("projects"));
+      if (formData.status === "done" && projectsData) {
+        const updatedProjectsData = projectsData.map((project) => {
+          if (project.id === parseInt(projectId)) {
+            const currentClosedTasks = Number(project.closed_tasks) || 0;
+
+            // Check if the task status is 'done'
+            const updatedClosedTasks =
+              formData.status === "done"
+                ? currentClosedTasks + 1
+                : currentClosedTasks;
+
+            return {
+              ...project,
+              closed_tasks: updatedClosedTasks.toString(),
+            };
+          }
+          return project;
+        });
+
+        sessionStorage.setItem("projects", JSON.stringify(updatedProjectsData));
+      }
+
       navigate(`/projects/${projectId}`);
     } catch (error) {
       setErrors(error);
-      console.error('Error updating task:', error);
+      console.error("Error updating task:", error);
     } finally {
       setLoading(false);
     }
@@ -216,12 +239,18 @@ function EditTaskPage() {
             maxLength={50}
             required
           />
-          {formData.name && formData.name.length === 0 && <span style={{ color: 'red' }}>Name is required.</span>}
+          {formData.name && formData.name.length === 0 && (
+            <span style={{ color: "red" }}>Name is required.</span>
+          )}
           {formData.name && formData.name.length < 2 && (
-            <span style={{ color: 'red' }}>Name must be at least 2 characters long.</span>
+            <span style={{ color: "red" }}>
+              Name must be at least 2 characters long.
+            </span>
           )}
           {formData.name && formData.name.length > 50 && (
-            <span style={{ color: 'red' }}>Name must be at most 50 characters long.</span>
+            <span style={{ color: "red" }}>
+              Name must be at most 50 characters long.
+            </span>
           )}
         </FormField>
         <FormField>
@@ -236,19 +265,29 @@ function EditTaskPage() {
             required
           />
           {formData.description && formData.description.length === 0 && (
-            <span style={{ color: 'red' }}>Description is required.</span>
+            <span style={{ color: "red" }}>Description is required.</span>
           )}
           {formData.description && formData.description.length < 2 && (
-            <span style={{ color: 'red' }}>Description must be at least 2 characters long.</span>
+            <span style={{ color: "red" }}>
+              Description must be at least 2 characters long.
+            </span>
           )}
           {formData.description && formData.description.length === 10000 && (
-            <span style={{ color: 'red' }}>Description must be at most 10000 characters long.</span>
+            <span style={{ color: "red" }}>
+              Description must be at most 10000 characters long.
+            </span>
           )}
         </FormField>
 
         <FormField>
           <Label htmlFor="status">Status:</Label>
-          <Select id="status" name="status" value={formData.status} onChange={handleChange} required>
+          <Select
+            id="status"
+            name="status"
+            value={formData.status}
+            onChange={handleChange}
+            required
+          >
             <option value="">Select status</option>
             <option value="to-do">To Do</option>
             <option value="in-progress">In Progress</option>
@@ -257,7 +296,13 @@ function EditTaskPage() {
         </FormField>
         <FormField>
           <Label htmlFor="priority">Priority:</Label>
-          <Select id="priority" name="priority" value={formData.priority} onChange={handleChange} required>
+          <Select
+            id="priority"
+            name="priority"
+            value={formData.priority}
+            onChange={handleChange}
+            required
+          >
             <option value="">Select priority</option>
             <option value="low">Low</option>
             <option value="medium">Medium</option>

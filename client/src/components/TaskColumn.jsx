@@ -41,7 +41,6 @@ const TaskContent = styled.div`
   flex-direction: column;
 `;
 
-
 const StyledLink = styled(Link)`
   text-decoration: none;
   color: #000000;
@@ -102,21 +101,26 @@ function TaskColumn({ tasks, title, mainStatus, onDeleteModalOpen }) {
             <TaskContent>
               <TaskDate>{task.date}</TaskDate>
               <StyledLink to={`/projects/${task.project_id}/tasks/${task.id}`}>
-              {task.name}
-            </StyledLink>
+                {task.name}
+              </StyledLink>
             </TaskContent>
             <ImageContainer>
               <img src={getTaskIcons(task.priority)} alt="Priority Icon" />
-              <Link to={`/projects/${task.project_id}/tasks/${task.id}/edit`}>
-                  <StyledIcon src={editIcon} />
-                </Link>
-              <StyledIcon
-                src={deleteIcon}
-                onClick={() => {
-                  console.log("Icon clicked"); // Add this line for debugging
-                  onDeleteClick(task.id);
-                }}
-              />
+              {mainStatus !== "done" && (
+                <>
+                  <Link
+                    to={`/projects/${task.project_id}/tasks/${task.id}/edit`}
+                  >
+                    <StyledIcon src={editIcon} />
+                  </Link>
+                  <StyledIcon
+                    src={deleteIcon}
+                    onClick={() => {
+                      onDeleteClick(task.id);
+                    }}
+                  />
+                </>
+              )}
             </ImageContainer>
           </TaskItem>
         ))}
