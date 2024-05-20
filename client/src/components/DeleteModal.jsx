@@ -81,10 +81,10 @@ export const DeleteModal = ({ projectId, onClose, onDelete }) => {
   return (
     <ModalOverlay onClick={handleCancelClick}>
       <ModalContent onClick={(e) => e.stopPropagation()}>
-        <Title>Delete Project</Title>
+        <Title>Deletion Confirmation</Title>
         <Message>
-          Deleting this project is irreversible. Are you sure you want to delete
-          this project?
+          Ensure data integrity by confirming the irreversible deletion. Are you
+          sure you want to delete?
         </Message>
         <ButtonContainer>
           <ConfirmButton onClick={() => handleConfirmClick()}>

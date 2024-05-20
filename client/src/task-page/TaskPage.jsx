@@ -32,7 +32,7 @@ const DetailItem = styled.div`
   }
 
   p {
-    font-size: 1.10rem;
+    font-size: 1.1rem;
     margin: 10px 0;
   }
 `;
@@ -138,17 +138,30 @@ const TaskPage = () => {
       await axios.delete(
         `http://localhost:1000/api/v1/planpro/projects/${projectId}/tasks/${task.id}`,
       );
-      
+
       const tasksKey = `project-id${projectId}_tasks`;
       let tasks = JSON.parse(sessionStorage.getItem(tasksKey)) || [];
-  
-      // Filter out the task to be deleted
+
       tasks = tasks.filter((t) => t.id !== task.id);
-  
-      // Save the updated list back to sessionStorage
       sessionStorage.setItem(tasksKey, JSON.stringify(tasks));
-  
-      // Navigate back to the project page
+
+      let projectsData = JSON.parse(sessionStorage.getItem("projects"));
+      if (projectsData) {
+        const updatedProjectsData = projectsData.map((project) => {
+          if (project.id === parseInt(projectId)) {
+            const currentTotalTasks = Number(project.total_tasks) || 0;
+
+            const closedTasks = currentTotalTasks - 1;
+
+            return {
+              ...project,
+              total_tasks: closedTasks.toString(),
+            };
+          }
+          return project;
+        });
+        sessionStorage.setItem("projects", JSON.stringify(updatedProjectsData));
+      }
       navigate(`/projects/${projectId}`);
     } catch (error) {
       console.error("Error deleting task:", error);
@@ -159,22 +172,24 @@ const TaskPage = () => {
     <>
       {task && (
         <TaskPageWrapper>
-          <TaskActionsContainer>
-            <TaskActions>
-              <ImageContainer>
-                <Link to={`/projects/${projectId}/tasks/${taskId}/edit`}>
-                  <StyledIcon src={editIcon} />
-                </Link>
-                <StyledIcon
-                  src={deleteIcon}
-                  onClick={() => {
-                    console.log("Icon clicked");
-                    onDeleteClick(task?.id);
-                  }}
-                />
-              </ImageContainer>
-            </TaskActions>
-          </TaskActionsContainer>
+          {task.status !== "done" && (
+            <TaskActionsContainer>
+              <TaskActions>
+                <ImageContainer>
+                  <Link to={`/projects/${projectId}/tasks/${taskId}/edit`}>
+                    <StyledIcon src={editIcon} />
+                  </Link>
+                  <StyledIcon
+                    src={deleteIcon}
+                    onClick={() => {
+                      console.log("Icon clicked");
+                      onDeleteClick(task?.id);
+                    }}
+                  />
+                </ImageContainer>
+              </TaskActions>
+            </TaskActionsContainer>
+          )}
           {task && (
             <TaskDetails>
               <DetailItem>
@@ -231,7 +246,7 @@ const TaskPage = () => {
           <SyncLoader color={"#FFC107"} loading={tasksLoading} size={20} />
         </LoadingContainer>
       )}
-    {deleteModalItemId && (
+      {deleteModalItemId && (
         <DeleteModal
           projectId={deleteModalItemId}
           onClose={() => setDeleteModalItemId(null)}

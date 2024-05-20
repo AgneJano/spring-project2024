@@ -1,7 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
-import styled from "styled-components";
+import { styled } from "styled-components";
 import SyncLoader from "react-spinners/SyncLoader";
 
 const RegistrationContainer = styled.div`
@@ -110,6 +110,7 @@ const LoadingContainer = styled.div`
   align-items: center;
   height: 200px;
 `;
+
 const CreateTaskForm = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -118,7 +119,7 @@ const CreateTaskForm = () => {
     name: "",
     description: "",
   });
-  const [priority, setPriority] = useState("medium"); // State variable for priority
+  const [priority, setPriority] = useState("medium");
 
   const handleChange = (e) => {
     setFormData({
@@ -142,6 +143,24 @@ const CreateTaskForm = () => {
 
       const newTask = response.data;
 
+      // Update project task count only if the ID matches the project ID
+      let projectsData = JSON.parse(sessionStorage.getItem("projects"));
+      if (projectsData) {
+        const updatedProjectsData = projectsData.map((project) => {
+          if (project.id === parseInt(id)) {
+            const currentTotalTasks = Number(project.total_tasks) || 0;
+            const updatedTotalTasks = currentTotalTasks + 1;
+            return {
+              ...project,
+              total_tasks: updatedTotalTasks.toString(),
+            };
+          }
+          return project;
+        });
+
+        sessionStorage.setItem("projects", JSON.stringify(updatedProjectsData));
+      }
+
       const storedTasks = sessionStorage.getItem(`project-id${id}_tasks`);
       let tasks = [];
 
@@ -154,6 +173,7 @@ const CreateTaskForm = () => {
       const updatedTasksData = JSON.stringify(tasks);
 
       sessionStorage.setItem(`project-id${id}_tasks`, updatedTasksData);
+
       navigate(`/projects/${id}`);
     } catch (error) {
       console.error("Error creating project:", error);
@@ -203,19 +223,6 @@ const CreateTaskForm = () => {
             maxLength={10000}
             required
           />
-          {formData.description && formData.description.length === 0 && (
-            <span style={{ color: "red" }}>Description is required.</span>
-          )}
-          {formData.description && formData.description.length < 2 && (
-            <span style={{ color: "red" }}>
-              Description must be at least 2 characters long.
-            </span>
-          )}
-          {formData.description && formData.description.length === 10000 && (
-            <span style={{ color: "red" }}>
-              Description must be at most 10000 characters long.
-            </span>
-          )}
         </FormField>
         <FormField>
           <Label htmlFor="priority">Priority:</Label>

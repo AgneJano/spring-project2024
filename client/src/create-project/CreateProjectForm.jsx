@@ -202,7 +202,7 @@ const CreateProjectForm = () => {
             name="description"
             value={formData.description}
             onChange={handleChange}
-            minLength={2}
+            minLength={3}
             maxLength={10000}
             required
           />

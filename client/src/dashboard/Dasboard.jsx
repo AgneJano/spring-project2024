@@ -141,7 +141,11 @@ export const Dashboard = () => {
       let activeProjects = projectsData.filter((project) => project.status === 'in-progress').length;
       let doneProjects = projectsData.filter((project) => project.status === 'done').length;
 
-      setProjectsInfo({ total: totalProjects, active: activeProjects, done: doneProjects });
+      setProjectsInfo({
+        total: totalProjects,
+        active: activeProjects,
+        done: doneProjects,
+      });
     }
   }, [projectsData, projectsLoading]);
 
@@ -186,7 +190,8 @@ export const Dashboard = () => {
         <WelcomeMessage>Dashboard</WelcomeMessage>
         {user && (
           <UserInfo>
-            Welcome, {user.name}! You are logged in as {user.role}. Here you can manage your projects, tasks, and more.
+            Welcome, {user.name}! You are logged in as {user.role}. Here you can
+            manage your projects, tasks, and more.
           </UserInfo>
         )}
         {projectsData && (

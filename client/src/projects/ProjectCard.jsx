@@ -89,8 +89,8 @@ export const ProjectCard = ({
   name,
   description,
   status,
-  tasksLeft,
-  tasks,
+  closed_tasks,
+  total_tasks,
   isVisibleDelete,
   onDeleteModalOpen,
 }) => {
@@ -121,7 +121,7 @@ export const ProjectCard = ({
         </DescriptionContainer>
         <TaskContainer>
           <TaskInfo>
-            Tasks left: {tasksLeft}/{tasks}
+            Tasks left: {closed_tasks}/{total_tasks}
           </TaskInfo>
           <ImageContainer>
             <StyledIcon
@@ -136,8 +136,6 @@ export const ProjectCard = ({
                 src={deleteIcon}
                 onClick={(e) => {
                   e.stopPropagation();
-
-                  console.log("delete");
                   onDeleteClick(id);
                 }}
               />

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useFetch } from "../fetching-data/UseFetch";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
@@ -109,15 +109,19 @@ function EditProjectPage() {
     "projects",
   );
 
+  // Keep track of the original project data
+  const originalProject = useMemo(() => {
+    return projectsData.find((project) => project.id === parseInt(id));
+  }, [projectsData, id]);
+
   useEffect(() => {
-    const project = projectsData.find((project) => project.id === parseInt(id));
-    if (project) {
+    if (originalProject) {
       setFormData({
-        name: project.name || "",
-        description: project.description || "",
+        name: originalProject.name || "",
+        description: originalProject.description || "",
       });
     }
-  }, [projectsData, id]);
+  }, [originalProject]);
 
   const handleChange = (e) => {
     setFormData({
@@ -133,15 +137,22 @@ function EditProjectPage() {
     if (errors !== null) {
       return;
     }
-  
+
     try {
       const response = await axios.patch(
         `http://localhost:1000/api/v1/planpro/projects/${id}`,
         formData,
       );
 
+      // Merge the updated fields with the original project data
+      const updatedProject = {
+        ...originalProject,
+        ...response.data,
+      };
+
+      // Update session storage with the updated project data
       const updatedProjects = projectsData.map((project) =>
-        project.id === parseInt(id) ? response.data : project,
+        project.id === parseInt(id) ? updatedProject : project,
       );
       sessionStorage.setItem("projects", JSON.stringify(updatedProjects));
 
