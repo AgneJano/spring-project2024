@@ -24,9 +24,11 @@ This is a Task Management System built using React and Node.js.
 1. Clone the repository from github:
    https://github.com/AgneJano/spring-project2024
 2. Open terminal on VSCODE and run command:
+   ```
    git clone https://github.com/AgneJano/spring-project2024
-3. Setup database in ProgreSQL
-4. Run commands in database
+   ```
+4. Setup database in ProgreSQL
+5. Run commands in database
 ```
 CREATE TABLE users (
 	id SERIAL PRIMARY KEY,
