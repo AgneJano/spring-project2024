@@ -121,7 +121,7 @@ export const ProjectCard = ({
         </DescriptionContainer>
         <TaskContainer>
           <TaskInfo>
-            Tasks left: {closed_tasks}/{total_tasks}
+            Tasks done: {closed_tasks}/{total_tasks}
           </TaskInfo>
           <ImageContainer>
             <StyledIcon
