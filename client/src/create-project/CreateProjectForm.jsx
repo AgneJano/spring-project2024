@@ -121,14 +121,23 @@ const CreateProjectForm = () => {
     let valid = true;
     const newErrors = {};
 
-    if (!formData.name || formData.name.length < 2 || formData.name.length > 50) {
+    if (
+      !formData.name ||
+      formData.name.length < 2 ||
+      formData.name.length > 50
+    ) {
       valid = false;
       newErrors.name = "Name must be between 2 and 50 characters long.";
     }
 
-    if (!formData.description || formData.description.length < 2 || formData.description.length > 10000) {
+    if (
+      !formData.description ||
+      formData.description.length < 2 ||
+      formData.description.length > 10000
+    ) {
       valid = false;
-      newErrors.description = "Description must be between 2 and 10000 characters long.";
+      newErrors.description =
+        "Description must be between 2 and 10000 characters long.";
     }
 
     setErrors(newErrors);
@@ -149,6 +158,9 @@ const CreateProjectForm = () => {
       );
 
       const newProject = response.data;
+      newProject.total_tasks = "0";
+      newProject.closed_tasks = "0";
+
       const storedProjects =
         JSON.parse(sessionStorage.getItem("projects")) || [];
 
