@@ -95,6 +95,19 @@ const SubmitButton = styled.button`
   }
 `;
 
+const Select = styled.select`
+  height: 40px;
+  padding: 5px;
+  border: 1px solid rgba(221, 221, 221, 1);
+  border-radius: 4px;
+  outline: none;
+  color: #333333;
+
+  &:focus {
+    border-color: #000;
+  }
+`;
+
 function EditProjectPage() {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -119,6 +132,7 @@ function EditProjectPage() {
       setFormData({
         name: originalProject.name || "",
         description: originalProject.description || "",
+        status: originalProject.status || '',
       });
     }
   }, [originalProject]);
@@ -220,6 +234,14 @@ function EditProjectPage() {
             </span>
           )}
         </FormField>
+       {Number(originalProject?.total_tasks) === Number(originalProject?.closed_tasks) && <FormField>
+          <Label htmlFor="status">Status:</Label>
+          <Select id="status" name="status" value={formData.status} onChange={handleChange} required>
+            {/* <option value="Select status">Select status</option> */}
+            <option value="in-progress">In Progress</option>
+            <option value="done">Done</option>
+          </Select>
+        </FormField>}
         {loading ? (
           <LoadingContainer>
             <SyncLoader color={"#FFC107"} loading={loading} size={20} />
