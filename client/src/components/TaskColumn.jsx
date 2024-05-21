@@ -3,6 +3,8 @@ import editIcon from "../assets/icons/edit.svg";
 import deleteIcon from "../assets/icons/delete.svg";
 import { getStatusSvgUrl, getTaskIcons } from "../mainFunctions";
 import { Link } from "react-router-dom";
+import { useContext } from "react";
+import { AuthContext } from "../utils/AuthContext";
 
 const ColumnContainer = styled.div`
   flex: 1;
@@ -82,6 +84,8 @@ const StatusBubble = styled.img`
 `;
 
 function TaskColumn({ tasks, title, mainStatus, onDeleteModalOpen }) {
+  const { isAdmin } = useContext(AuthContext);
+
   const onDeleteClick = async (projectId) => {
     onDeleteModalOpen(projectId);
   };
@@ -113,12 +117,14 @@ function TaskColumn({ tasks, title, mainStatus, onDeleteModalOpen }) {
                   >
                     <StyledIcon src={editIcon} />
                   </Link>
+                  {isAdmin && (
                   <StyledIcon
                     src={deleteIcon}
                     onClick={() => {
                       onDeleteClick(task.id);
                     }}
                   />
+                  )}
                 </>
               )}
             </ImageContainer>

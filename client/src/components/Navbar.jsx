@@ -96,7 +96,7 @@ const LogoutLink = styled.p`
 `;
 
 function Navbar() {
-  const { isAuthenticated, logoutUser } = useContext(AuthContext);
+  const { isAuthenticated, isAdmin, logoutUser } = useContext(AuthContext);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -129,6 +129,11 @@ function Navbar() {
                   <img src={account_icon} alt="Account icon" />
                 </Icon>
                 <DropdownContent isOpen={isMenuOpen}>
+                  {isAdmin && (
+                    <DropdownItem>
+                      <Link to="/logs">Logs</Link>
+                    </DropdownItem>
+                  )}
                   <DropdownItem onClick={handleLogout}>
                     <LogoutLink>Log out</LogoutLink>
                   </DropdownItem>

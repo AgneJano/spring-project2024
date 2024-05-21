@@ -7,7 +7,8 @@ import SyncLoader from "react-spinners/SyncLoader";
 import { useFetch } from "../fetching-data/UseFetch";
 import axios from "axios";
 import { DeleteModal } from "../components/DeleteModal";
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { AuthContext } from "../utils/AuthContext";
 
 const TaskPageWrapper = styled.div`
   display: flex;
@@ -103,6 +104,7 @@ const TaskPage = () => {
   const { projectId, taskId } = useParams();
   const [deleteModalItemId, setDeleteModalItemId] = useState(null);
   const navigate = useNavigate();
+  const { isAdmin } = useContext(AuthContext);
 
   const onDeleteClick = async (taskId) => {
     setDeleteModalItemId(taskId);
@@ -179,6 +181,7 @@ const TaskPage = () => {
                   <Link to={`/projects/${projectId}/tasks/${taskId}/edit`}>
                     <StyledIcon src={editIcon} />
                   </Link>
+                  {isAdmin && (
                   <StyledIcon
                     src={deleteIcon}
                     onClick={() => {
@@ -186,6 +189,7 @@ const TaskPage = () => {
                       onDeleteClick(task?.id);
                     }}
                   />
+                  )}
                 </ImageContainer>
               </TaskActions>
             </TaskActionsContainer>
