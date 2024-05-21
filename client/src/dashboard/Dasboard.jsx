@@ -250,9 +250,6 @@ export const Dashboard = () => {
             <Label>Done</Label>
             <DoneInfo>{tasksCount && tasksCount.done}</DoneInfo>
           </StyledInfoItem>
-          <StyledInfoItem>
-            <ManageLink href="/projects">Manage your projects</ManageLink>
-          </StyledInfoItem>
         </InfoBox>
 
         <InfoBox>
@@ -274,9 +271,6 @@ export const Dashboard = () => {
             <PriorityIcon src={getTaskIcons('low')} alt="Low priority" />
             <Label>Low</Label>
             <TotalInfo>{tasksCount && tasksCount.low_priority}</TotalInfo>
-          </StyledInfoItem>
-          <StyledInfoItem>
-            <ManageLink href="/projects">Manage your projects</ManageLink>
           </StyledInfoItem>
         </InfoBox>
       </RightColumn>
